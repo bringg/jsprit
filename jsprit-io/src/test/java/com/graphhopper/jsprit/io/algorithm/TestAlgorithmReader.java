@@ -282,4 +282,5 @@ public class TestAlgorithmReader {
         new AlgorithmConfigXmlReader(algoConfig).read(getClass().getResource("algorithmConfig_withoutIterations.xml"));
 
     }
+    
 }
