@@ -87,7 +87,7 @@ public class TestAlgorithmReader {
 
     @Test
     public void whenSettingPrematureBreak_itShouldReadTermination() {
-        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, 1, getClass().getResource("algorithmConfigForReaderTest2.xml"));
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, getClass().getResource("algorithmConfigForReaderTest2.xml"));
         IterationCounter iCounter = new IterationCounter();
         vra.addListener(iCounter);
         vra.searchSolutions();
@@ -282,5 +282,4 @@ public class TestAlgorithmReader {
         new AlgorithmConfigXmlReader(algoConfig).read(getClass().getResource("algorithmConfig_withoutIterations.xml"));
 
     }
-    
 }
