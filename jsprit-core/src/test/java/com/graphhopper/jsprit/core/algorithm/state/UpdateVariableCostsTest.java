@@ -17,6 +17,34 @@
  */
 package com.graphhopper.jsprit.core.algorithm.state;
 
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.util.ActivityTimeTracker;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.Mockito.*;
+
 public class UpdateVariableCostsTest {
 
+    VehicleRoutingActivityCosts activityCosts = Mockito.mock(VehicleRoutingActivityCosts.class);
+    VehicleRoutingTransportCosts transportCosts = Mockito.mock(VehicleRoutingTransportCosts.class);
+    StateManager stateManager = Mockito.mock(StateManager.class);
+    ActivityTimeTracker timeTracker = Mockito.mock(ActivityTimeTracker.class);
+
+    UpdateVariableCosts updateVariableCosts = new UpdateVariableCosts(
+        activityCosts,
+        transportCosts,
+        stateManager,
+        ActivityTimeTracker.ActivityPolicy.AS_SOON_AS_ARRIVED,
+        timeTracker);
+
+    @Test
+    public void testWithTimeTrackerBegin() {
+        VehicleRoute route = Mockito.mock(VehicleRoute.class);
+        doNothing().when(timeTracker).begin(route);
+        updateVariableCosts.begin(route);
+        verify(timeTracker, times(1)).begin(route);
+    }
 }
