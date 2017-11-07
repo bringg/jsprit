@@ -400,6 +400,13 @@ public class VehicleRoutingAlgorithms {
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, null, EMPTY_HINTS);
     }
 
+    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final URL configURL, Map<String, Object> hints) {
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read(configURL);
+        return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, null, hints);
+    }
+
     /**
      * Read and creates {@link com.graphhopper.jsprit.core.problem.VehicleRoutingProblem} from config-file.
      *
@@ -426,6 +433,13 @@ public class VehicleRoutingAlgorithms {
         AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
         xmlReader.read(configFileName);
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, stateManager, EMPTY_HINTS);
+    }
+
+    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final String configFileName, Map<String, Object> hints) {
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read(configFileName);
+        return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, null, hints);
     }
 
     public static VehicleRoutingAlgorithm readAndCreateAlgorithm(VehicleRoutingProblem vrp, int nThreads, String configFileName) {
@@ -610,6 +624,7 @@ public class VehicleRoutingAlgorithms {
             });
             stateManager.addStateUpdater(timeWindowUpdater);
             activityPolicy = ActivityTimeTracker.ActivityPolicy.AS_SOON_AS_TIME_WINDOW_OPENS;
+            addCoreConstraints = false;
         } else {
             activityPolicy = ActivityTimeTracker.ActivityPolicy.AS_SOON_AS_ARRIVED;
         }

@@ -18,11 +18,12 @@ public class DefaultTimeOnSameLocationTimeTracker extends ActivityTimeTracker {
 
     @Override
     public void visit(TourActivity activity) {
-        super.visit(activity);
+        double activityTime = 0;
         if(activity.getLocation().getCoordinate().equals(prevAct.getLocation().getCoordinate())) {
-            double activityTime = activityDurationOnSameLocation - activityCosts.getActivityDuration(activity,actArrTime,route.getDriver(),route.getVehicle());
-            actEndTime += activityTime;
-            startAtPrevAct += activityTime;
+            activityTime = activityDurationOnSameLocation - activityCosts.getActivityDuration(activity,actArrTime,route.getDriver(),route.getVehicle());
         }
+        super.visit(activity);
+        actEndTime += activityTime;
+        startAtPrevAct += activityTime;
     }
 }

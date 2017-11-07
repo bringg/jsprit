@@ -32,6 +32,8 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms.ModKey;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms.TypedMap.AcceptorKey;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms.TypedMap.RuinStrategyKey;
@@ -43,10 +45,13 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -87,7 +92,7 @@ public class TestAlgorithmReader {
 
     @Test
     public void whenSettingPrematureBreak_itShouldReadTermination() {
-        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, getClass().getResource("algorithmConfigForReaderTest2.xml"));
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, 1, getClass().getResource("algorithmConfigForReaderTest2.xml"));
         IterationCounter iCounter = new IterationCounter();
         vra.addListener(iCounter);
         vra.searchSolutions();
@@ -283,4 +288,164 @@ public class TestAlgorithmReader {
 
     }
 
+    @Test
+    public void testReaderWithRightUseOfHints() {
+        Random random = new Random();
+        int serviceTime = random.nextInt(5) + 1;
+        double serviceTimeOnSameLocation = random.nextDouble();
+        List<TourActivity> activities = testIt(serviceTime, serviceTimeOnSameLocation, true);
+
+        TourActivity activity1 = activities.get(0);
+        TourActivity activity2 = activities.get(1);
+        TourActivity activity3 = activities.get(2);
+        TourActivity activity4 = activities.get(3);
+
+        assertTrue(activity1.getLocation().getCoordinate().equals(activity2.getLocation().getCoordinate()));
+        assertFalse(activity3.getLocation().getCoordinate().equals(activity4.getLocation().getCoordinate()));
+
+        assertTrue(assertDoubleEquals(activity1.getEndTime() - activity1.getArrTime(), serviceTime));
+        assertTrue(assertDoubleEquals(activity2.getEndTime() - activity2.getArrTime(), serviceTimeOnSameLocation));
+        assertTrue(assertDoubleEquals(activity3.getEndTime() - activity3.getArrTime(), serviceTime));
+        assertTrue(assertDoubleEquals(activity4.getEndTime() - activity4.getArrTime(), serviceTime));
+    }
+
+    @Test
+    public void testReaderWithRightUseOfHintsSqashFalse() {
+        Random random = new Random();
+        double serviceTimeOnSameLocation = random.nextDouble();
+        int serviceTime = random.nextInt(5);
+        List<TourActivity> activities = testIt(serviceTime, serviceTimeOnSameLocation, false);
+
+        TourActivity activity1 = activities.get(0);
+        TourActivity activity2 = activities.get(1);
+        TourActivity activity3 = activities.get(2);
+        TourActivity activity4 = activities.get(3);
+
+        assertTrue(activity1.getLocation().getCoordinate().equals(activity2.getLocation().getCoordinate()));
+        assertFalse(activity3.getLocation().getCoordinate().equals(activity4.getLocation().getCoordinate()));
+
+        assertTrue(assertDoubleEquals(activity1.getEndTime() - activity1.getArrTime(), serviceTime));
+        assertTrue(assertDoubleEquals(activity2.getEndTime() - activity2.getArrTime(), serviceTime));
+        assertTrue(assertDoubleEquals(activity3.getEndTime() - activity3.getArrTime(), serviceTime));
+        assertTrue(assertDoubleEquals(activity4.getEndTime() - activity4.getArrTime(), serviceTime));
+    }
+
+    private boolean assertDoubleEquals(double x1, double x2) {
+        return Math.abs(x1 - x2) < 1E-10;
+    }
+
+    private List<TourActivity> testIt(int serviceTime, double serviceTimeOnSameLocation, boolean sqash) {
+        String body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<problem xmlns=\"http://www.w3schools.com\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3schools.com vrp_xml_schema.xsd\">\n" +
+            "  <problemType>\n" +
+            "    <fleetSize>FINITE</fleetSize>\n" +
+            "    <fleetComposition>HOMOGENEOUS</fleetComposition>\n" +
+            "  </problemType>\n" +
+            "  <vehicles>\n" +
+            "    <vehicle>\n" +
+            "      <id>57145</id>\n" +
+            "      <typeId>748</typeId>\n" +
+            "      <startLocation>\n" +
+            "        <id>home_57145</id>\n" +
+            "        <coord x=\"" + 34.840348 + "\" y=\"" + 32.114538 + "\"/>\n" +
+            "      </startLocation>\n" +
+            "      <timeSchedule>\n" +
+            "        <start>0</start>\n" +
+            "        <end>480</end>\n" +
+            "      </timeSchedule>\n" +
+            "      <returnToDepot>false</returnToDepot>\n" +
+            "    </vehicle>\n" +
+            "    <vehicle>\n" +
+            "      <id>57146</id>\n" +
+            "      <typeId>748</typeId>\n" +
+            "      <startLocation>\n" +
+            "        <id>home_57145</id>\n" +
+            "        <coord x=\"" + 34.840348 + "\" y=\"" + 32.114538 + "\"/>\n" +
+            "      </startLocation>\n" +
+            "      <timeSchedule>\n" +
+            "        <start>0</start>\n" +
+            "        <end>480</end>\n" +
+            "      </timeSchedule>\n" +
+            "      <returnToDepot>false</returnToDepot>\n" +
+            "    </vehicle>\n" +
+            "  </vehicles>\n" +
+            "  <vehicleTypes>\n" +
+            "    <type>\n" +
+            "      <id>748</id>\n" +
+            "      <capacity>60</capacity>\n" +
+            "      <costs>\n" +
+            "        <fixed>0</fixed>\n" +
+            "        <distance>1</distance>\n" +
+            "        <time>0</time>\n" +
+            "      </costs>\n" +
+            "    </type>\n" +
+            "  </vehicleTypes>\n" +
+            "  <services/>\n" +
+            "  <shipments>\n" +
+            "    <shipment id=\"1\">\n" +
+            "      <pickup>\n" +
+            "        <locationId>6550849_8390421</locationId>\n" +
+            "        <coord x=\"" + 34.834159 + "\" y=\"" + 32.106582 + "\"/>\n" +
+            "        <duration>" + serviceTime + "</duration>\n" +
+            "        <timeWindows>\n" +
+            "          <timeWindow>\n" +
+            "            <start>0</start>\n" +
+            "            <end>480</end>\n" +
+            "          </timeWindow>\n" +
+            "        </timeWindows>\n" +
+            "      </pickup>\n" +
+            "      <delivery>\n" +
+            "        <locationId>6550850_8390422</locationId>\n" +
+            "        <coord x=\"" + 34.818851 + "\" y=\"" + 32.105050 + "\"/>\n" +
+            "        <duration>" + serviceTime + "</duration>\n" +
+            "        <timeWindows>\n" +
+            "          <timeWindow>\n" +
+            "            <start>0</start>\n" +
+            "            <end>480</end>\n" +
+            "          </timeWindow>\n" +
+            "        </timeWindows>\n" +
+            "      </delivery>\n" +
+            "      <capacity-demand>1</capacity-demand>\n" +
+            "    </shipment>\n" +
+            "    <shipment id=\"2\">\n" +
+            "      <pickup>\n" +
+            "        <locationId>6550851_8390423</locationId>\n" +
+            "        <coord x=\"" + 34.834159 + "\" y=\"" + 32.106582 + "\"/>\n" +
+            "        <duration>" + serviceTime + "</duration>\n" +
+            "        <timeWindows>\n" +
+            "          <timeWindow>\n" +
+            "            <start>0</start>\n" +
+            "            <end>480</end>\n" +
+            "          </timeWindow>\n" +
+            "        </timeWindows>\n" +
+            "      </pickup>\n" +
+            "      <delivery>\n" +
+            "        <locationId>6550852_8390424</locationId>\n" +
+            "        <coord x=\"" + 34.824272 + "\" y=\"" + 32.088730 + "\"/>\n" +
+            "        <duration>" + serviceTime + "</duration>\n" +
+            "        <timeWindows>\n" +
+            "          <timeWindow>\n" +
+            "            <start>0</start>\n" +
+            "            <end>480</end>\n" +
+            "          </timeWindow>\n" +
+            "        </timeWindows>\n" +
+            "      </delivery>\n" +
+            "      <capacity-demand>1</capacity-demand>\n" +
+            "    </shipment>\n" +
+            "  </shipments>\n" +
+            "</problem>";
+
+        final VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
+        final InputStream requestInputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+        new VrpXMLReader(vrpBuilder).read(requestInputStream);
+
+        Map<String, Object> hints = new HashMap<>();
+        hints.put("sqash", sqash);
+        hints.put("time_on_same_location", serviceTimeOnSameLocation);
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrpBuilder.build(), Runtime.getRuntime().availableProcessors() + 1, getClass().getResource("algorithmConfigForReaderTest.xml"), hints);
+
+        VehicleRoutingProblemSolution vehicleRoutingProblemSolution = Solutions.bestOf(vra.searchSolutions());
+        assertTrue(vehicleRoutingProblemSolution.getUnassignedJobs().isEmpty());
+        return vehicleRoutingProblemSolution.getRoutes().iterator().next().getActivities();
+    }
 }
