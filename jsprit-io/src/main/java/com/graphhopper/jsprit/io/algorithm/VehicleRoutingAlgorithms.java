@@ -369,7 +369,7 @@ public class VehicleRoutingAlgorithms {
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), 0, null, null);
     }
 
-    public static VehicleRoutingAlgorithm createAlgorithm(final VehicleRoutingProblem vrp, final AlgorithmConfig algorithmConfig, Map<String, Object> hints) {
+    public static VehicleRoutingAlgorithm createAlgorithm(final VehicleRoutingProblem vrp, final AlgorithmConfig algorithmConfig, Map<String, String> hints) {
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), 0, null, hints);
     }
 
@@ -398,7 +398,7 @@ public class VehicleRoutingAlgorithms {
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, null, null);
     }
 
-    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final URL configURL, Map<String, Object> hints) {
+    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final URL configURL, Map<String, String> hints) {
         AlgorithmConfig algorithmConfig = new AlgorithmConfig();
         AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
         xmlReader.read(configURL);
@@ -433,7 +433,7 @@ public class VehicleRoutingAlgorithms {
         return createAlgo(vrp, algorithmConfig.getXMLConfiguration(), nThreads, stateManager, null);
     }
 
-    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final String configFileName, Map<String, Object> hints) {
+    public static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, int nThreads, final String configFileName, Map<String, String> hints) {
         AlgorithmConfig algorithmConfig = new AlgorithmConfig();
         AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
         xmlReader.read(configFileName);
@@ -480,7 +480,7 @@ public class VehicleRoutingAlgorithms {
     }
 
     private static VehicleRoutingAlgorithm createAlgo(final VehicleRoutingProblem vrp, XMLConfiguration config, int nuOfThreads, StateManager stateMan,
-                                                      Map<String, Object> hints) {
+                                                      Map<String, String> hints) {
         //create state-manager
         final StateManager stateManager;
         if (stateMan != null) {
@@ -501,8 +501,8 @@ public class VehicleRoutingAlgorithms {
 		 */
         //constraint manager
         ConstraintManager constraintManager;
-        if (hints != null && hints.containsKey("sqash") && Boolean.valueOf(hints.get("sqash").toString())) {
-            final Double timeOnSameLocation = Double.valueOf(hints.get("time_on_same_location").toString());
+        if (hints != null && hints.containsKey("sqash") && Boolean.valueOf(hints.get("sqash"))) {
+            final Double timeOnSameLocation = Double.valueOf(hints.get("time_on_same_location"));
             constraintManager = new ConstraintManager(vrp, stateManager) {
                 @Override
                 public double getCosts(JobInsertionContext iFacts, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double prevActDepTime) {
@@ -550,7 +550,7 @@ public class VehicleRoutingAlgorithms {
                                                                   ConstraintManager constraintManager,
                                                                   boolean addDefaultCostCalculators,
                                                                   boolean addCoreConstraints,
-                                                                  Map<String, Object> hints) {
+                                                                  Map<String, String> hints) {
         // map to store constructed modules
         TypedMap definedClasses = new TypedMap();
 
@@ -627,8 +627,8 @@ public class VehicleRoutingAlgorithms {
             activityPolicy = ActivityTimeTracker.ActivityPolicy.AS_SOON_AS_ARRIVED;
         }
 
-        if (hints != null && hints.containsKey("sqash") && Boolean.parseBoolean(hints.get("sqash").toString())) {
-            Double timeOnSameLocation = Double.valueOf(hints.get("time_on_same_location").toString());
+        if (hints != null && hints.containsKey("sqash") && Boolean.parseBoolean(hints.get("sqash"))) {
+            Double timeOnSameLocation = Double.valueOf(hints.get("time_on_same_location"));
 
             stateManager.addStateUpdater(
                 new UpdateActivityTimes(
