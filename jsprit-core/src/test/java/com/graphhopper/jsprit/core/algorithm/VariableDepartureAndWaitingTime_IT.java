@@ -25,7 +25,6 @@ import com.graphhopper.jsprit.core.analysis.SolutionAnalyser;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
-import com.graphhopper.jsprit.core.problem.cost.TransportDistance;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Service;
@@ -40,7 +39,6 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * Created by schroeder on 22/07/15.
@@ -60,12 +58,12 @@ public class VariableDepartureAndWaitingTime_IT {
         activityCosts = new VehicleRoutingActivityCosts() {
 
             @Override
-            public double getActivityCost(TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
+            public double getActivityCost(TourActivity prevAct, TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
                 return vehicle.getType().getVehicleCostParams().perWaitingTimeUnit * Math.max(0, tourAct.getTheoreticalEarliestOperationStartTime() - arrivalTime);
             }
 
             @Override
-            public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
+            public double getActivityDuration(TourActivity prevAct, TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
                 return tourAct.getOperationTime();
             }
 
@@ -82,12 +80,7 @@ public class VariableDepartureAndWaitingTime_IT {
                     .setObjectiveFunction(new SolutionCostCalculator() {
                         @Override
                         public double getCosts(VehicleRoutingProblemSolution solution) {
-                            SolutionAnalyser sa = new SolutionAnalyser(vrp, solution, new TransportDistance() {
-                                @Override
-                                public double getDistance(Location from, Location to, double departureTime, Vehicle vehicle) {
-                                    return vrp.getTransportCosts().getTransportCost(from, to, 0., null, null);
-                                }
-                            });
+                            SolutionAnalyser sa = new SolutionAnalyser(vrp, solution, vrp.getTransportCosts());
                             return sa.getWaitingTime() + sa.getDistance();
                         }
                     })
