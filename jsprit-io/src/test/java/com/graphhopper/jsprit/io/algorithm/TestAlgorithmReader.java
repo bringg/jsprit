@@ -30,6 +30,7 @@ import com.graphhopper.jsprit.core.algorithm.selector.SelectBest;
 import com.graphhopper.jsprit.core.algorithm.selector.SolutionSelector;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
+import com.graphhopper.jsprit.core.problem.solution.SolutionCostCalculator;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms.ModKey;
@@ -42,6 +43,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,7 +65,7 @@ public class TestAlgorithmReader {
         config = new AlgorithmConfig();
         new AlgorithmConfigXmlReader(config).setSchemaValidation(false).read(getClass().getResource("testConfig.xml"));
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        solutions = new ArrayList<VehicleRoutingProblemSolution>();
+        solutions = new ArrayList<>();
         new VrpXMLReader(vrpBuilder, solutions).read(getClass().getResourceAsStream("finiteVrp.xml"));
         vrp = vrpBuilder.build();
     }
@@ -281,6 +283,13 @@ public class TestAlgorithmReader {
         AlgorithmConfig algoConfig = new AlgorithmConfig();
         new AlgorithmConfigXmlReader(algoConfig).read(getClass().getResource("algorithmConfig_withoutIterations.xml"));
 
+    }
+
+    @Test
+    public void testWithVehicleRoutingAlgorithm() {
+        SolutionCostCalculator solutionCostCalculator = Mockito.mock(SolutionCostCalculator.class);
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, 10, getClass().getResource("algorithmConfig_withoutIterations.xml").getFile(), solutionCostCalculator);
+        vra.getObjectiveFunction().equals(solutionCostCalculator);
     }
 
 }
