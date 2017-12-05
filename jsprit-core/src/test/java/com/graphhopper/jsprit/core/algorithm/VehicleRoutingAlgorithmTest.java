@@ -112,7 +112,7 @@ public class VehicleRoutingAlgorithmTest {
         algorithm.setMaxIterations(1000);
         CountIterations counter = new CountIterations();
         algorithm.addListener(counter);
-        Collection<VehicleRoutingProblemSolution> vehicleRoutingProblemSolutions = algorithm.searchSolutionsWithSolutions(solutions);
+        Collection<VehicleRoutingProblemSolution> vehicleRoutingProblemSolutions = algorithm.searchSolutions(solutions);
         assertEquals(1000, counter.getCountIterations());
         assertEquals(Solutions.bestOf(vehicleRoutingProblemSolutions).getCost(), bestSolutionCost, 0.001);
     }

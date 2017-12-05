@@ -217,15 +217,7 @@ public class VehicleRoutingAlgorithm {
         return searchSolutions(new ArrayList<>(initialSolutions));
     }
 
-    public Collection<VehicleRoutingProblemSolution> searchSolutionsWithSolutions(Collection<VehicleRoutingProblemSolution> solutions) {
-        for (VehicleRoutingProblemSolution solution : solutions) {
-            memorizeIfBestEver(solution);
-        }
-
-        return searchSolutions(solutions);
-    }
-
-    private Collection<VehicleRoutingProblemSolution> searchSolutions(Collection<VehicleRoutingProblemSolution> solutions) {
+    public Collection<VehicleRoutingProblemSolution> searchSolutions(Collection<VehicleRoutingProblemSolution> solutions) {
         logger.info("algorithm starts: [maxIterations={}]", maxIterations);
         double now = System.currentTimeMillis();
         counter.reset();
