@@ -26,6 +26,7 @@ import com.graphhopper.jsprit.core.problem.solution.InitialSolutionFactory;
 import com.graphhopper.jsprit.core.problem.solution.SolutionCostCalculator;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverService;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,9 @@ public final class InsertionInitialSolutionFactory implements InitialSolutionFac
         ArrayList<Job> jobs = new ArrayList<>(vrp.getJobs().values());
         for (VehicleRoute route : vrp.getInitialVehicleRoutes()) {
             for(TourActivity activity : route.getActivities()) {
-                jobs.remove(activity);
+                if (activity instanceof DeliverService)
+                    jobs.remove(((DeliverService)activity).getJob());
+
             }
         }
 //        for (Vehicle v : vrp.getVehicles()) {
