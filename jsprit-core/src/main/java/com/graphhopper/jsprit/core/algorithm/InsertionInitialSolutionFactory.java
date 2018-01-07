@@ -26,6 +26,7 @@ import com.graphhopper.jsprit.core.problem.solution.InitialSolutionFactory;
 import com.graphhopper.jsprit.core.problem.solution.SolutionCostCalculator;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public final class InsertionInitialSolutionFactory implements InitialSolutionFac
     @Override
     public VehicleRoutingProblemSolution createSolution(final VehicleRoutingProblem vrp) {
         logger.info("create initial solution");
-        List<VehicleRoute> vehicleRoutes = new ArrayList<VehicleRoute>();
+        List<VehicleRoute> vehicleRoutes = new ArrayList<>();
         vehicleRoutes.addAll(vrp.getInitialVehicleRoutes());
         Collection<Job> badJobs = insertion.insertJobs(vehicleRoutes, getUnassignedJobs(vrp));
         VehicleRoutingProblemSolution solution = new VehicleRoutingProblemSolution(vehicleRoutes, badJobs, Double.MAX_VALUE);
@@ -61,7 +62,12 @@ public final class InsertionInitialSolutionFactory implements InitialSolutionFac
     }
 
     private List<Job> getUnassignedJobs(VehicleRoutingProblem vrp) {
-        ArrayList<Job> jobs = new ArrayList<Job>(vrp.getJobs().values());
+        ArrayList<Job> jobs = new ArrayList<>(vrp.getJobs().values());
+        for (VehicleRoute route : vrp.getInitialVehicleRoutes()) {
+            for(TourActivity activity : route.getActivities()) {
+                jobs.remove(activity);
+            }
+        }
 //        for (Vehicle v : vrp.getVehicles()) {
 //            if (v.getBreak() != null) jobs.add(v.getBreak());
 //        }
