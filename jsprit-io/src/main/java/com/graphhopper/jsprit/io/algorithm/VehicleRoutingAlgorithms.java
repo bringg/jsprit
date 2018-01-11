@@ -607,7 +607,7 @@ public class VehicleRoutingAlgorithms {
         List<HierarchicalConfiguration> strategyConfigs = config.configurationsAt("strategy.searchStrategies.searchStrategy");
         for (HierarchicalConfiguration strategyConfig : strategyConfigs) {
             String name = getName(strategyConfig);
-            SolutionAcceptor acceptor = getAcceptor(strategyConfig, vrp, algorithmListeners, definedClasses, solutionMemory);
+            SolutionAcceptor acceptor = getAcceptor(strategyConfig, vrp, algorithmListeners, definedClasses, solutionMemory,solutionCostCalculator);
             SolutionSelector selector = getSelector(strategyConfig, vrp, algorithmListeners, definedClasses);
 
             SearchStrategy strategy = new SearchStrategy(name, selector, acceptor, costCalculator);
@@ -796,7 +796,7 @@ public class VehicleRoutingAlgorithms {
         return new ModKey(name, id);
     }
 
-    private static SolutionAcceptor getAcceptor(HierarchicalConfiguration strategyConfig, VehicleRoutingProblem vrp, Set<PrioritizedVRAListener> algorithmListeners, TypedMap typedMap, int solutionMemory) {
+    private static SolutionAcceptor getAcceptor(HierarchicalConfiguration strategyConfig, VehicleRoutingProblem vrp, Set<PrioritizedVRAListener> algorithmListeners, TypedMap typedMap, int solutionMemory, SolutionCostCalculator solutionCostCalculator) {
         String acceptorName = strategyConfig.getString("acceptor[@name]");
         if (acceptorName == null) throw new IllegalStateException("no solution acceptor is defined");
         String acceptorId = strategyConfig.getString("acceptor[@id]");
@@ -819,10 +819,10 @@ public class VehicleRoutingAlgorithms {
             typedMap.put(acceptorKey, acceptor);
             return acceptor;
         }
-        if (acceptorName.equals("schrimpfAcceptance")) {
+        if (acceptorName.equals("schrimpfAcceptance") || acceptorName.equals("schrimpfAcceptanceWithBreaks")) {
             String nuWarmupIterations = strategyConfig.getString("acceptor.warmup");
             double alpha = strategyConfig.getDouble("acceptor.alpha");
-            SchrimpfAcceptance schrimpf = new SchrimpfAcceptance(solutionMemory, alpha);
+            SchrimpfAcceptance schrimpf = acceptorName.equals("schrimpfAcceptance") ? new SchrimpfAcceptance(solutionMemory, alpha) : new SchrimpfAcceptanceWithBreaks(solutionCostCalculator, solutionMemory, alpha);
             if (nuWarmupIterations != null) {
                 SchrimpfInitialThresholdGenerator iniThresholdGenerator = new SchrimpfInitialThresholdGenerator(schrimpf, Integer.parseInt(nuWarmupIterations));
                 algorithmListeners.add(new PrioritizedVRAListener(Priority.LOW, iniThresholdGenerator));

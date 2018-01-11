@@ -56,7 +56,7 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
         final double[] results = new double[nOfRandomWalks];
 
         Jsprit.Builder builder = new GreedySchrimpfFactory().createGreedyAlgorithmBuilder(problem);
-        builder.setCustomAcceptor(new AcceptNewRemoveFirst(1));
+        builder.setCustomAcceptor(schrimpfAcceptance);
         VehicleRoutingAlgorithm vra = builder.buildAlgorithm();
         vra.setMaxIterations(nOfRandomWalks);
         vra.getAlgorithmListeners().addListener(new IterationEndsListener() {
