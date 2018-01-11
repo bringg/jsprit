@@ -122,6 +122,7 @@
                     <xs:enumeration value="acceptNewRemoveFirst"/>
                     <xs:enumeration value="greedyAcceptance"/>
                     <xs:enumeration value="greedyAcceptance_minVehFirst"/>
+                    <xs:enumeration value="schrimpfAcceptanceWithBreaks"/>
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
