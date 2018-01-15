@@ -23,9 +23,11 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.BreakActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.End;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.state.RouteAndActivityStateGetter;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 
 
 /**
@@ -128,6 +130,8 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
 
         if (nextAct instanceof End) {
             if (!iFacts.getNewVehicle().isReturnToDepot()) {
+                if (newAct instanceof BreakActivity && iFacts.getNewVehicle().getBreak() != null)
+                    return breakFulfilled(iFacts.getNewVehicle(), prevAct, newAct, nextAct);
                 return ConstraintsStatus.FULFILLED;
             }
         }
@@ -143,6 +147,21 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
         if (arrTimeAtNextAct > latestArrTimeAtNextAct) {
             return ConstraintsStatus.NOT_FULFILLED;
         }
+        if (newAct instanceof BreakActivity && iFacts.getNewVehicle().getBreak() != null)
+            return breakFulfilled(iFacts.getNewVehicle(), prevAct, newAct, nextAct);
+        return ConstraintsStatus.FULFILLED;
+    }
+
+    private ConstraintsStatus breakFulfilled(Vehicle vehicle, TourActivity prevAct, TourActivity newAct, TourActivity nextAct) {
+//        if (vehicle.getBreak() != null) {
+//            final double prevActEarlestEndTime = prevAct.getTheoreticalEarliestOperationStartTime() + prevAct.getOperationTime();
+//
+//            if (prevActEarlestEndTime <= vehicle.getBreak().getTimeWindow().getStart() && prevActEarlestEndTime + vehicle.getBreak().getServiceDuration() <= newAct.getTheoreticalLatestOperationStartTime())
+//                return ConstraintsStatus.FULFILLED;
+//
+//            final double newActEarlestEndTime = prevAct.getTheoreticalEarliestOperationStartTime() + prevAct.getOperationTime();
+//
+//        }
         return ConstraintsStatus.FULFILLED;
     }
 }
