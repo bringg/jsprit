@@ -114,7 +114,6 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
 
             double activityEnd = activityStart + activityCosts.getActivityDuration(null, activity, activityArrival, route.getDriver(), v);
             Map<Job, Double> openPickups = openPickupEndTimesPerVehicle.get(vehicleIndex);
-
             if (activity instanceof ServiceActivity || activity instanceof PickupActivity) {
                 openPickups.put(((TourActivity.JobActivity) activity).getJob(), activityEnd);
             } else if (activity instanceof DeliveryActivity) {
