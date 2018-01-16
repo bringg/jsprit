@@ -30,10 +30,7 @@ import com.graphhopper.jsprit.core.util.RandomNumberGeneration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public abstract class AbstractInsertionStrategy implements InsertionStrategy {
 
@@ -95,6 +92,13 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
     public Collection<Job> insertJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
         insertionsListeners.informInsertionStarts(vehicleRoutes, unassignedJobs);
         Collection<Job> badJobs = insertUnassignedJobs(vehicleRoutes, unassignedJobs);
+        List <Job> breaks = new ArrayList<>();
+        for (VehicleRoute route : vehicleRoutes) {
+            if (route.getVehicle().getBreak() != null) {
+                breaks.add(route.getVehicle().getBreak());
+            }
+        }
+        badJobs.addAll(insertUnassignedJobs(vehicleRoutes, breaks));
         insertionsListeners.informInsertionEndsListeners(vehicleRoutes);
         return badJobs;
     }
