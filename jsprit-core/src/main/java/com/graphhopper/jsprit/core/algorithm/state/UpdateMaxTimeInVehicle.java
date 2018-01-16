@@ -111,7 +111,7 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
             double activityArrival = prevActEndTimes[v.getVehicleTypeIdentifier().getIndex()] + transportTime.getTransportTime(prevActLocation,activity.getLocation(),prevActEndTime,route.getDriver(),v);
             double activityStart = Math.max(activityArrival,activity.getTheoreticalEarliestOperationStartTime());
             memorizeActStart(activity,v,activityStart);
-            
+
             double activityEnd = activityStart + activityCosts.getActivityDuration(null, activity, activityArrival, route.getDriver(), v);
             Map<Job, Double> openPickups = openPickupEndTimesPerVehicle.get(vehicleIndex);
 
