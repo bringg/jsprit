@@ -22,6 +22,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,9 @@ public class RegretInsertionConcurrent extends AbstractInsertionStrategy {
     @Override
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> routes, Collection<Job> unassignedJobs) {
         List<Job> badJobs = new ArrayList<Job>(unassignedJobs.size());
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        final int numUnassigned = unassignedJobs.size();
 
         Iterator<Job> jobIterator = unassignedJobs.iterator();
         while (jobIterator.hasNext()){
@@ -128,6 +132,9 @@ public class RegretInsertionConcurrent extends AbstractInsertionStrategy {
                 markUnassigned(unassigned, bad.getInsertionData().getFailedConstraintNames());
             }
         }
+        stopWatch.stop();
+        final double compTimeInSeconds = stopWatch.getCompTimeInSeconds();
+        logger.debug("took {} dec to assign {} jobs, {} in avg per job", compTimeInSeconds, numUnassigned, compTimeInSeconds / numUnassigned);
         return badJobs;
     }
 

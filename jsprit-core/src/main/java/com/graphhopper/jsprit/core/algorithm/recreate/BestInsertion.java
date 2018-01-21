@@ -21,6 +21,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.util.NoiseMaker;
+import com.graphhopper.jsprit.core.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,8 +64,12 @@ public final class BestInsertion extends AbstractInsertionStrategy {
 
     @Override
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
-        List<Job> badJobs = new ArrayList<Job>(unassignedJobs.size());
-        List<Job> unassignedJobList = new ArrayList<Job>(unassignedJobs);
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        final int numUnassigned = unassignedJobs.size();
+
+        List<Job> badJobs = new ArrayList<>(unassignedJobs.size());
+        List<Job> unassignedJobList = new ArrayList<>(unassignedJobs);
         Collections.shuffle(unassignedJobList, random);
         Collections.sort(unassignedJobList, new AccordingToPriorities());
         for (Job unassignedJob : unassignedJobList) {
@@ -99,6 +104,10 @@ public final class BestInsertion extends AbstractInsertionStrategy {
             }
             else insertJob(unassignedJob, bestInsertion.getInsertionData(), bestInsertion.getRoute());
         }
+
+        stopWatch.stop();
+        final double compTimeInSeconds = stopWatch.getCompTimeInSeconds();
+        logger.debug("took {} dec to assign {} jobs, {} in avg per job", compTimeInSeconds, numUnassigned, compTimeInSeconds / numUnassigned);
         return badJobs;
     }
 
