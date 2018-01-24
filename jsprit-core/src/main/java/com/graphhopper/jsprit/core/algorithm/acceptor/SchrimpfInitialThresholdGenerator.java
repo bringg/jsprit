@@ -22,7 +22,6 @@ import com.graphhopper.jsprit.core.algorithm.box.GreedySchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmStartsListener;
 import com.graphhopper.jsprit.core.algorithm.listener.IterationEndsListener;
-import com.graphhopper.jsprit.core.algorithm.ruin.RuinBreaks;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
@@ -70,7 +69,6 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
             }
 
         });
-        vra.addListener(new RuinBreaks());
         vra.searchSolutions(solutions);
 
         StandardDeviation dev = new StandardDeviation();
