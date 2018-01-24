@@ -137,7 +137,7 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
 
     public double getSavings(Vehicle oldVehicle, Vehicle newVehicle) {
         if (oldVehicle != null && !(oldVehicle instanceof VehicleImpl.NoVehicle))
-            return oldVehicle.getType().getVehicleCostParams().fix - newVehicle.getType().getVehicleCostParams().fix;
+            return newVehicle.getType().getVehicleCostParams().fix - oldVehicle.getType().getVehicleCostParams().fix;
 
         return .0;
     }
