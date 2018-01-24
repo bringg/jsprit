@@ -28,6 +28,7 @@ import com.graphhopper.jsprit.core.util.RandomNumberGeneration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
@@ -63,7 +64,12 @@ public abstract class AbstractRuinStrategy implements RuinStrategy {
     @Override
     public Collection<Job> ruin(Collection<VehicleRoute> vehicleRoutes) {
         ruinListeners.ruinStarts(vehicleRoutes);
-        Collection<Job> unassigned = ruinRoutes(vehicleRoutes);
+        Collection<Job> unassigned = new ArrayList<>(ruinRoutes(vehicleRoutes));
+
+        for (VehicleRoute vehicleRoute : vehicleRoutes)
+            if (vehicleRoute.getVehicle().getBreak() != null)
+                unassigned.add(vehicleRoute.getVehicle().getBreak());
+
         logger.trace("ruin: [ruined={}]", unassigned.size());
         ruinListeners.ruinEnds(vehicleRoutes, unassigned);
         return unassigned;
