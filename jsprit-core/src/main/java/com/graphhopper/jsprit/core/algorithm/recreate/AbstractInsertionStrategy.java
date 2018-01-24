@@ -26,6 +26,7 @@ import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.util.RandomNumberGeneration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,11 +127,19 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
         insertionsListeners.informBeforeJobInsertion(unassignedJob, iData, inRoute);
         if (!(inRoute.getVehicle().getId().equals(iData.getSelectedVehicle().getId()))) {
             insertionsListeners.informVehicleSwitched(inRoute, inRoute.getVehicle(), iData.getSelectedVehicle());
+            iData.setInsertionCost(iData.getInsertionCost() + getSavings(inRoute.getVehicle(), iData.getSelectedVehicle()));
         }
         for (Event e : iData.getEvents()) {
             eventListeners.inform(e);
         }
         insertionsListeners.informJobInserted(unassignedJob, inRoute, iData.getInsertionCost(), iData.getAdditionalTime());
+    }
+
+    public double getSavings(Vehicle oldVehicle, Vehicle newVehicle) {
+        if (oldVehicle != null && !(oldVehicle instanceof VehicleImpl.NoVehicle))
+            return oldVehicle.getType().getVehicleCostParams().fix - newVehicle.getType().getVehicleCostParams().fix;
+
+        return .0;
     }
 
 }
