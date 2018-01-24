@@ -135,7 +135,7 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
         insertionsListeners.informJobInserted(unassignedJob, inRoute, iData.getInsertionCost(), iData.getAdditionalTime());
     }
 
-    public double getSavings(Vehicle oldVehicle, Vehicle newVehicle) {
+    double getSavings(Vehicle oldVehicle, Vehicle newVehicle) {
         if (oldVehicle != null && !(oldVehicle instanceof VehicleImpl.NoVehicle))
             return newVehicle.getType().getVehicleCostParams().fix - oldVehicle.getType().getVehicleCostParams().fix;
 
