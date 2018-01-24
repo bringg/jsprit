@@ -69,7 +69,7 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
             }
 
         });
-        vra.searchSolutions();
+        vra.searchSolutions(solutions);
 
         StandardDeviation dev = new StandardDeviation();
         double standardDeviation = dev.evaluate(results);

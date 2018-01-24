@@ -41,6 +41,7 @@ public class AcceptNewRemoveFirst implements SolutionAcceptor {
      */
     @Override
     public boolean acceptSolution(Collection<VehicleRoutingProblemSolution> solutions, VehicleRoutingProblemSolution newSolution) {
+
         if (solutions.size() >= solutionMemory) {
             solutions.remove(solutions.iterator().next());
         }
