@@ -20,7 +20,7 @@ package com.graphhopper.jsprit.core.util;
 
 public class StopWatch {
 
-    private double ran;
+    private double ran = .0;
 
     private double startTime;
 
