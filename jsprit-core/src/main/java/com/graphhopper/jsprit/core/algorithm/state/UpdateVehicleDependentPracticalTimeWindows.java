@@ -36,7 +36,7 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
     public void visit(VehicleRoute route) {
         begin(route);
         Iterator<TourActivity> revIterator = route.getTourActivities().reverseActivityIterator();
-        TourActivity prevAct = null;
+        TourActivity prevAct = route.getEnd();
         while (revIterator.hasNext()) {
             final TourActivity next = revIterator.next();
             visit(prevAct, next);
