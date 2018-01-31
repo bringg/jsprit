@@ -283,6 +283,10 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
         return state;
     }
 
+    public <T> T getActivityState(TourActivity prev, TourActivity newAct, TourActivity act, Vehicle vehicle, StateId stateId, Class<T> type) {
+        return getActivityState(act, vehicle, stateId, type);
+    }
+
     private ClassCastException getClassCastException(ClassCastException e, StateId stateId, String requestedTypeClass, String memorizedTypeClass) {
         return new ClassCastException(e + "\n" + "state with stateId '" + stateId.toString() + "' is of " + memorizedTypeClass + ". cannot cast it to " + requestedTypeClass + ".");
     }
