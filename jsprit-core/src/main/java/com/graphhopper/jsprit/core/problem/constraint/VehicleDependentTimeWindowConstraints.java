@@ -18,6 +18,7 @@
 
 package com.graphhopper.jsprit.core.problem.constraint;
 
+import com.graphhopper.jsprit.core.algorithm.state.InternalStates;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
@@ -57,10 +58,10 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
                 nextActLocation = newAct.getLocation();
             }
         } else {
-//            latestArrTimeAtNextAct = states.getActivityState(nextAct, iFacts.getNewVehicle(), InternalStates.LATEST_OPERATION_START_TIME, Double.class);
-//            if (latestArrTimeAtNextAct == null) {//otherwise set it to theoretical_latest_operation_startTime
+            latestArrTimeAtNextAct = states.getActivityState(nextAct, iFacts.getNewVehicle(), InternalStates.LATEST_OPERATION_START_TIME, Double.class);
+            if (latestArrTimeAtNextAct == null) {//otherwise set it to theoretical_latest_operation_startTime
                 latestArrTimeAtNextAct = nextAct.getTheoreticalLatestOperationStartTime();
-//            }
+            }
             nextActLocation = nextAct.getLocation();
         }
 
@@ -113,7 +114,7 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
             Math.min(newAct.getTheoreticalLatestOperationStartTime(),
                 latestArrTimeAtNextAct -
                     routingCosts.getBackwardTransportTime(newAct.getLocation(), nextActLocation, latestArrTimeAtNextAct, iFacts.getNewDriver(), iFacts.getNewVehicle())
-                    - activityCosts.getActivityDuration(prevAct, newAct, arrTimeAtNewAct, iFacts.getNewDriver(), iFacts.getNewVehicle())
+                    - activityCosts.getActivityDuration(newAct, nextAct, arrTimeAtNewAct, iFacts.getNewDriver(), iFacts.getNewVehicle())
             );
 
 			/*
