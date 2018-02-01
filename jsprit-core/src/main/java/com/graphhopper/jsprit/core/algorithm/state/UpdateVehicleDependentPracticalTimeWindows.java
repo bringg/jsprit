@@ -71,6 +71,8 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
 
     private Collection<Vehicle> vehicles;
 
+    private TourActivity nextActivity = null;
+
     public UpdateVehicleDependentPracticalTimeWindows(StateManager stateManager, VehicleRoutingTransportCosts tpCosts, VehicleRoutingActivityCosts activityCosts) {
         super();
         this.stateManager = stateManager;
@@ -96,6 +98,7 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
             }
             location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()] = location;
         }
+        nextActivity = route.getEnd();
     }
 
 
@@ -104,7 +107,7 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
             double latestArrTimeAtPrevAct = latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
             Location prevLocation = location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
             double potentialLatestArrivalTimeAtCurrAct = latestArrTimeAtPrevAct - transportCosts.getBackwardTransportTime(activity.getLocation(), prevLocation,
-                latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(null, activity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
+                latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(activity, nextActivity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
             double latestArrivalTime = Math.min(activity.getTheoreticalLatestOperationStartTime(), potentialLatestArrivalTimeAtCurrAct);
             if (latestArrivalTime < activity.getTheoreticalEarliestOperationStartTime()) {
                 stateManager.putTypedInternalRouteState(route, vehicle, InternalStates.SWITCH_NOT_FEASIBLE, true);
@@ -112,6 +115,7 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
             stateManager.putInternalTypedActivityState(activity, vehicle, InternalStates.LATEST_OPERATION_START_TIME, latestArrivalTime);
             latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()] = latestArrivalTime;
             location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()] = activity.getLocation();
+            nextActivity = activity;
         }
     }
 
