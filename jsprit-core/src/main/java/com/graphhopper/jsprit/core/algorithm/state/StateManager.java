@@ -76,7 +76,7 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
 
     private Object[][] activityStates;
 
-    private Object[][][] vehicleDependentActivityStates;
+    protected Object[][][] vehicleDependentActivityStates;
 
     private Map<VehicleRoute, Object[]> routeStateMap;
 

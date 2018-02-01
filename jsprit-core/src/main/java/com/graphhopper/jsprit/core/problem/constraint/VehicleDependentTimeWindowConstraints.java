@@ -146,4 +146,3 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
         return ConstraintsStatus.FULFILLED;
     }
 }
-
