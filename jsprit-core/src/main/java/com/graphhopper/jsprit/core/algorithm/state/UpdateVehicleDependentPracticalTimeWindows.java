@@ -115,8 +115,9 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
             stateManager.putInternalTypedActivityState(activity, vehicle, InternalStates.LATEST_OPERATION_START_TIME, latestArrivalTime);
             latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()] = latestArrivalTime;
             location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()] = activity.getLocation();
-            nextActivity = activity;
         }
+
+        nextActivity = activity;
     }
 
 
