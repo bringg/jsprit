@@ -51,6 +51,8 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
 
     private Location[] prevActLocations;
 
+    private TourActivity prevAct = null;
+
     private Collection<Vehicle> vehicles;
 
     private final TransportTime transportTime;
@@ -97,8 +99,10 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
             actStartTimesPerVehicle.put(vehicleIndex, new HashMap<TourActivity, Double>());
             prevActEndTimes[vehicleIndex] = v.getEarliestDeparture();
             prevActLocations[vehicleIndex] = v.getStartLocation();
+            prevAct = route.getStart();
         }
     }
+
 
     @Override
     public void visit(TourActivity activity) {
@@ -111,7 +115,7 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
             double activityArrival = prevActEndTimes[v.getVehicleTypeIdentifier().getIndex()] + transportTime.getTransportTime(prevActLocation,activity.getLocation(),prevActEndTime,route.getDriver(),v);
             double activityStart = Math.max(activityArrival,activity.getTheoreticalEarliestOperationStartTime());
             memorizeActStart(activity,v,activityStart);
-            double activityEnd = activityStart + activityCosts.getActivityDuration(null, activity, activityArrival, route.getDriver(), v);
+            double activityEnd = activityStart + activityCosts.getActivityDuration(prevAct, activity, activityArrival, route.getDriver(), v);
             Map<Job, Double> openPickups = openPickupEndTimesPerVehicle.get(vehicleIndex);
             if (activity instanceof ServiceActivity || activity instanceof PickupActivity) {
                 openPickups.put(((TourActivity.JobActivity) activity).getJob(), activityEnd);
@@ -125,8 +129,10 @@ public class UpdateMaxTimeInVehicle implements StateUpdater, ActivityVisitor{
                 double slackTime = maxTime - (activityStart - pickupEnd);
                 slackTimesPerVehicle.get(vehicleIndex).put(activity, slackTime);
             }
+
             prevActLocations[vehicleIndex] = activity.getLocation();
             prevActEndTimes[vehicleIndex] = activityEnd;
+            prevAct = activity;
         }
 
     }

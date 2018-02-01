@@ -29,6 +29,8 @@ public interface RouteAndActivityStateGetter {
 
     public <T> T getActivityState(TourActivity act, Vehicle vehicle, StateId stateId, Class<T> type);
 
+    public <T> T getActivityState(TourActivity prevAct, TourActivity act, TourActivity next, Vehicle vehicle, StateId stateId, Class<T> type);
+
     public <T> T getRouteState(VehicleRoute route, StateId stateId, Class<T> type);
 
     public <T> T getRouteState(VehicleRoute route, Vehicle vehicle, StateId stateId, Class<T> type);

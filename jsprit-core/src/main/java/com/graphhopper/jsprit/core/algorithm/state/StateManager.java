@@ -74,9 +74,9 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
 
     private Object[] problemStates;
 
-    private Object[][] activityStates;
+    protected Object[][] activityStates;
 
-    private Object[][][] vehicleDependentActivityStates;
+    protected Object[][][] vehicleDependentActivityStates;
 
     private Map<VehicleRoute, Object[]> routeStateMap;
 
@@ -281,6 +281,10 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
             throw getClassCastException(e, stateId, type.toString(), state_class.getClass().toString());
         }
         return state;
+    }
+
+    public <T> T getActivityState(TourActivity prev, TourActivity newAct, TourActivity act, Vehicle vehicle, StateId stateId, Class<T> type) {
+        return getActivityState(act, vehicle, stateId, type);
     }
 
     private ClassCastException getClassCastException(ClassCastException e, StateId stateId, String requestedTypeClass, String memorizedTypeClass) {

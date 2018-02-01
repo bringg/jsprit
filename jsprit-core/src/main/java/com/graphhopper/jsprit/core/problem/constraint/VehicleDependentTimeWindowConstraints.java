@@ -58,7 +58,7 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
                 nextActLocation = newAct.getLocation();
             }
         } else {
-            latestArrTimeAtNextAct = states.getActivityState(nextAct, iFacts.getNewVehicle(), InternalStates.LATEST_OPERATION_START_TIME, Double.class);
+            latestArrTimeAtNextAct = states.getActivityState(prevAct, newAct, nextAct, iFacts.getNewVehicle(), InternalStates.LATEST_OPERATION_START_TIME, Double.class);
             if (latestArrTimeAtNextAct == null) {//otherwise set it to theoretical_latest_operation_startTime
                 latestArrTimeAtNextAct = nextAct.getTheoreticalLatestOperationStartTime();
             }
