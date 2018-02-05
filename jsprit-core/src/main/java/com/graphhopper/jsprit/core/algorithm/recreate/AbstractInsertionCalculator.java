@@ -174,15 +174,15 @@ abstract class AbstractInsertionCalculator implements JobInsertionCostsCalculato
         public FulfilledHelper2 invoke() {
             for (HardActivityConstraint c : constraintManager.getHighPrioHardActivityConstraints()) {
                 status = c.fulfilled(iFacts, prevAct, newAct, nextAct, prevActDepTime);
-                if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
-                    failedActivityConstraints.add(c.getClass().getSimpleName());
-                    myResult = true;
-                    return this;
-                } else {
+//                if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
+//                    failedActivityConstraints.add(c.getClass().getSimpleName());
+//                    myResult = true;
+//                    return this;
+//                } else {
                     if (status.equals(ConstraintsStatus.NOT_FULFILLED)) {
                         failed.add(c.getClass().getSimpleName());
                         notFulfilled = status;
-                    }
+//                    }
                 }
             }
             myResult = false;
