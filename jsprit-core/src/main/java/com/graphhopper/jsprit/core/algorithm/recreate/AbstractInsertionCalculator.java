@@ -48,35 +48,21 @@ abstract class AbstractInsertionCalculator implements JobInsertionCostsCalculato
     ConstraintsStatus fulfilled(JobInsertionContext iFacts, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double prevActDepTime, Collection<String> failedActivityConstraints, ConstraintManager constraintManager) {
         ConstraintsStatus notFulfilled = null;
         List<String> failed = new ArrayList<>();
-        for (HardActivityConstraint c : constraintManager.getCriticalHardActivityConstraints()) {
-            ConstraintsStatus status = c.fulfilled(iFacts, prevAct, newAct, nextAct, prevActDepTime);
-            if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
-                failedActivityConstraints.add(c.getClass().getSimpleName());
-                return status;
-            } else {
-                if (status.equals(ConstraintsStatus.NOT_FULFILLED)) {
-                    failed.add(c.getClass().getSimpleName());
-                    notFulfilled = status;
-                }
-            }
-        }
+        FulfilledHelper fulfilledHelper = new FulfilledHelper(iFacts, prevAct, newAct, nextAct, prevActDepTime, failedActivityConstraints, constraintManager, notFulfilled, failed).invoke();
+        if (fulfilledHelper.is())
+            return fulfilledHelper.getStatus();
+        notFulfilled = fulfilledHelper.getNotFulfilled();
+//        ConstraintsStatus status = fulfilledHelper.getStatus();
         if (notFulfilled != null) {
             failedActivityConstraints.addAll(failed);
             return notFulfilled;
         }
 
-        for (HardActivityConstraint c : constraintManager.getHighPrioHardActivityConstraints()) {
-            ConstraintsStatus status = c.fulfilled(iFacts, prevAct, newAct, nextAct, prevActDepTime);
-            if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
-                failedActivityConstraints.add(c.getClass().getSimpleName());
-                return status;
-            } else {
-                if (status.equals(ConstraintsStatus.NOT_FULFILLED)) {
-                    failed.add(c.getClass().getSimpleName());
-                    notFulfilled = status;
-                }
-            }
-        }
+        FulfilledHelper2 fulfilledHelper2 = new FulfilledHelper2(iFacts, prevAct, newAct, nextAct, prevActDepTime, failedActivityConstraints, constraintManager, notFulfilled, failed).invoke();
+        if (fulfilledHelper2.is())
+            return fulfilledHelper2.getStatus();
+        notFulfilled = fulfilledHelper2.getNotFulfilled();
+//        ConstraintsStatus status = fulfilledHelper2.getStatus();
         if (notFulfilled != null) {
             failedActivityConstraints.addAll(failed);
             return notFulfilled;
@@ -92,4 +78,115 @@ abstract class AbstractInsertionCalculator implements JobInsertionCostsCalculato
         return ConstraintsStatus.FULFILLED;
     }
 
+    private class FulfilledHelper {
+        private boolean myResult;
+        private JobInsertionContext iFacts;
+        private TourActivity prevAct;
+        private TourActivity newAct;
+        private TourActivity nextAct;
+        private double prevActDepTime;
+        private Collection<String> failedActivityConstraints;
+        private ConstraintManager constraintManager;
+        private ConstraintsStatus notFulfilled;
+        private List<String> failed;
+        private ConstraintsStatus status;
+
+        public FulfilledHelper(JobInsertionContext iFacts, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double prevActDepTime, Collection<String> failedActivityConstraints, ConstraintManager constraintManager, ConstraintsStatus notFulfilled, List<String> failed) {
+            this.iFacts = iFacts;
+            this.prevAct = prevAct;
+            this.newAct = newAct;
+            this.nextAct = nextAct;
+            this.prevActDepTime = prevActDepTime;
+            this.failedActivityConstraints = failedActivityConstraints;
+            this.constraintManager = constraintManager;
+            this.notFulfilled = notFulfilled;
+            this.failed = failed;
+        }
+
+        boolean is() {
+            return myResult;
+        }
+
+        public ConstraintsStatus getNotFulfilled() {
+            return notFulfilled;
+        }
+
+        public ConstraintsStatus getStatus() {
+            return status;
+        }
+
+        public FulfilledHelper invoke() {
+            for (HardActivityConstraint c : constraintManager.getCriticalHardActivityConstraints()) {
+                status = c.fulfilled(iFacts, prevAct, newAct, nextAct, prevActDepTime);
+                if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
+                    failedActivityConstraints.add(c.getClass().getSimpleName());
+                    myResult = true;
+                    return this;
+                } else {
+                    if (status.equals(ConstraintsStatus.NOT_FULFILLED)) {
+                        failed.add(c.getClass().getSimpleName());
+                        notFulfilled = status;
+                    }
+                }
+            }
+            myResult = false;
+            return this;
+        }
+    }
+
+    private class FulfilledHelper2 {
+        private boolean myResult;
+        private JobInsertionContext iFacts;
+        private TourActivity prevAct;
+        private TourActivity newAct;
+        private TourActivity nextAct;
+        private double prevActDepTime;
+        private Collection<String> failedActivityConstraints;
+        private ConstraintManager constraintManager;
+        private ConstraintsStatus notFulfilled;
+        private List<String> failed;
+        private ConstraintsStatus status;
+
+        public FulfilledHelper2(JobInsertionContext iFacts, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double prevActDepTime, Collection<String> failedActivityConstraints, ConstraintManager constraintManager, ConstraintsStatus notFulfilled, List<String> failed) {
+            this.iFacts = iFacts;
+            this.prevAct = prevAct;
+            this.newAct = newAct;
+            this.nextAct = nextAct;
+            this.prevActDepTime = prevActDepTime;
+            this.failedActivityConstraints = failedActivityConstraints;
+            this.constraintManager = constraintManager;
+            this.notFulfilled = notFulfilled;
+            this.failed = failed;
+        }
+
+        boolean is() {
+            return myResult;
+        }
+
+        public ConstraintsStatus getNotFulfilled() {
+            return notFulfilled;
+        }
+
+        public ConstraintsStatus getStatus() {
+            return status;
+        }
+
+        public FulfilledHelper2 invoke() {
+            for (HardActivityConstraint c : constraintManager.getHighPrioHardActivityConstraints()) {
+                status = c.fulfilled(iFacts, prevAct, newAct, nextAct, prevActDepTime);
+                if (status.equals(ConstraintsStatus.NOT_FULFILLED_BREAK)) {
+                    failedActivityConstraints.add(c.getClass().getSimpleName());
+                    myResult = true;
+                    return this;
+                } else {
+                    if (status.equals(ConstraintsStatus.NOT_FULFILLED)) {
+                        failed.add(c.getClass().getSimpleName());
+                        notFulfilled = status;
+                    }
+                }
+            }
+            myResult = false;
+            return this;
+        }
+    }
 }
