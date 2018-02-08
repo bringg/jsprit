@@ -38,13 +38,9 @@ import java.util.*;
  *
  * @author stefan schroeder
  */
-public class RegretInsertionFast extends AbstractInsertionStrategy {
+public class RegretInsertionFast extends RegretInsertion {
 
     private static Logger logger = LoggerFactory.getLogger(RegretInsertionFast.class);
-
-    private ScoringFunction scoringFunction;
-
-    private JobInsertionCostsCalculator insertionCostsCalculator;
 
     private VehicleFleetManager fleetManager;
 
@@ -55,25 +51,13 @@ public class RegretInsertionFast extends AbstractInsertionStrategy {
     private DependencyType[] dependencyTypes = null;
 
     public RegretInsertionFast(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, VehicleFleetManager fleetManager) {
-        super(vehicleRoutingProblem);
-        this.scoringFunction = new DefaultScorer(vehicleRoutingProblem);
-        this.insertionCostsCalculator = jobInsertionCalculator;
+        super(jobInsertionCalculator, vehicleRoutingProblem);
         this.fleetManager = fleetManager;
         this.vrp = vehicleRoutingProblem;
         this.initialVehicleIds = getInitialVehicleIds(vehicleRoutingProblem);
         logger.debug("initialise {}", this);
     }
 
-    /**
-     * Sets the scoring function.
-     * <p>
-     * <p>By default, the this.TimeWindowScorer is used.
-     *
-     * @param scoringFunction to score
-     */
-    public void setScoringFunction(ScoringFunction scoringFunction) {
-        this.scoringFunction = scoringFunction;
-    }
 
     public void setSwitchAllowed(boolean switchAllowed) {
         this.switchAllowed = switchAllowed;
@@ -90,12 +74,6 @@ public class RegretInsertionFast extends AbstractInsertionStrategy {
         }
         return ids;
     }
-
-    @Override
-    public String toString() {
-        return "[name=regretInsertion][additionalScorer=" + scoringFunction + "]";
-    }
-
 
     /**
      * Runs insertion.
@@ -126,7 +104,7 @@ public class RegretInsertionFast extends AbstractInsertionStrategy {
 //            }
 //        }
 
-        List<Job> jobs = new ArrayList<Job>(unassignedJobs);
+        List<Job> jobs = new ArrayList<>(unassignedJobs);
         TreeSet<VersionedInsertionData>[] priorityQueues = new TreeSet[vrp.getJobs().values().size() + 2];
         VehicleRoute lastModified = null;
         boolean firstRun = true;
@@ -148,20 +126,13 @@ public class RegretInsertionFast extends AbstractInsertionStrategy {
             updateRound++;
             ScoredJob bestScoredJob = InsertionDataUpdater.getBest(switchAllowed,initialVehicleIds,fleetManager,insertionCostsCalculator,scoringFunction,priorityQueues,updates,unassignedJobList,badJobList);
             if (bestScoredJob != null) {
-                if (bestScoredJob.isNewRoute()) {
-                    routes.add(bestScoredJob.getRoute());
-                }
-                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), bestScoredJob.getRoute());
+                insertJob(routes, badJobs, bestScoredJob);
                 jobs.remove(bestScoredJob.getJob());
                 lastModified = bestScoredJob.getRoute();
             }
             else lastModified = null;
-            for (ScoredJob bad : badJobList) {
-                Job unassigned = bad.getJob();
-                jobs.remove(unassigned);
-                badJobs.add(unassigned);
-                markUnassigned(unassigned, bad.getInsertionData().getFailedConstraintNames());
-            }
+
+            updateUnassignedJobs(badJobs, jobs, badJobList);
         }
         return badJobs;
     }
