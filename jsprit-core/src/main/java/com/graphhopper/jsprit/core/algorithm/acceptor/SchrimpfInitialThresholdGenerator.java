@@ -56,7 +56,7 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
         final double[] results = new double[nOfRandomWalks];
 
         Jsprit.Builder builder = new GreedySchrimpfFactory().createGreedyAlgorithmBuilder(problem);
-        builder.setCustomAcceptor(new AcceptNewRemoveFirst(1));
+        builder.setCustomAcceptor(new AcceptNewRemoveFirst(nOfRandomWalks));
         VehicleRoutingAlgorithm vra = builder.buildAlgorithm();
         vra.setMaxIterations(nOfRandomWalks);
         vra.getAlgorithmListeners().addListener(new IterationEndsListener() {
@@ -69,7 +69,8 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
             }
 
         });
-        vra.searchSolutions(solutions);
+
+        solutions.add(Solutions.bestOf(vra.searchSolutions()));
 
         StandardDeviation dev = new StandardDeviation();
         double standardDeviation = dev.evaluate(results);
