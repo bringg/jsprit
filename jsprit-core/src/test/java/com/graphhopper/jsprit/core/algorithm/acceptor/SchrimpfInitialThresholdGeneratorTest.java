@@ -1,9 +1,12 @@
 package com.graphhopper.jsprit.core.algorithm.acceptor;
 
+import com.graphhopper.jsprit.core.algorithm.SearchStrategy;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.GreedySchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmEndsListener;
+import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmStartsListener;
+import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListener;
+import com.graphhopper.jsprit.core.algorithm.termination.PrematureAlgorithmTermination;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Service;
@@ -46,12 +49,17 @@ public class SchrimpfInitialThresholdGeneratorTest {
         assertTrue(listener.callsCounter > 0);
     }
 
-    class Listener implements AlgorithmEndsListener {
+    class Listener implements VehicleRoutingAlgorithmListener, AlgorithmStartsListener, PrematureAlgorithmTermination {
         int callsCounter = 0;
 
         @Override
-        public void informAlgorithmEnds(VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
-            ++callsCounter;
+        public boolean isPrematureBreak(SearchStrategy.DiscoveredSolution discoveredSolution) {
+            return false;
+        }
+
+        @Override
+        public void informAlgorithmStarts(VehicleRoutingProblem problem, VehicleRoutingAlgorithm algorithm, Collection<VehicleRoutingProblemSolution> solutions) {
+            callsCounter++;
         }
     }
 }

@@ -23,6 +23,7 @@ import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmStartsListener;
 import com.graphhopper.jsprit.core.algorithm.listener.IterationEndsListener;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListener;
+import com.graphhopper.jsprit.core.algorithm.termination.PrematureAlgorithmTermination;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
@@ -72,9 +73,10 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
         });
 
         for (VehicleRoutingAlgorithmListener l : algorithm.getAlgorithmListeners().getAlgorithmListeners())
-            if (!(l instanceof SchrimpfInitialThresholdGenerator || l instanceof ExperimentalSchrimpfAcceptance))
+            if (l instanceof PrematureAlgorithmTermination)
                 vra.getAlgorithmListeners().addListener(l);
 
+        algorithm.getAlgorithmListeners();
         vra.searchSolutions();
 
         StandardDeviation dev = new StandardDeviation();
