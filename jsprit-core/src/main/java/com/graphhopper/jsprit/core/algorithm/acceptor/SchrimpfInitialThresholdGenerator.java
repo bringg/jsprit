@@ -72,7 +72,7 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
         });
 
         for (VehicleRoutingAlgorithmListener l : algorithm.getAlgorithmListeners().getAlgorithmListeners())
-            if (!(l instanceof SchrimpfInitialThresholdGenerator))
+            if (!(l instanceof SchrimpfInitialThresholdGenerator || l instanceof ExperimentalSchrimpfAcceptance))
                 vra.getAlgorithmListeners().addListener(l);
 
         vra.searchSolutions();

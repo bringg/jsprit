@@ -38,6 +38,7 @@ public class SchrimpfInitialThresholdGeneratorTest {
 
         Listener listener = new Listener();
         vra.getAlgorithmListeners().addListener(listener);
+        vra.getAlgorithmListeners().addListener(schrimpfInitialThresholdGenerator);
 
         Collection<VehicleRoutingProblemSolution> solutions = new HashSet<>();
 
