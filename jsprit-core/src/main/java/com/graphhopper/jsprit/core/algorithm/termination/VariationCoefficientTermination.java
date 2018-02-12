@@ -52,11 +52,11 @@ public class VariationCoefficientTermination implements PrematureAlgorithmTermin
 
     private final int noIterations;
 
-    private final double variationCoefficientThreshold;
+    protected final double variationCoefficientThreshold;
 
     private int currentIteration;
 
-    private double[] solutionValues;
+    protected double[] solutionValues;
 
     private VehicleRoutingProblemSolution lastAccepted = null;
 
