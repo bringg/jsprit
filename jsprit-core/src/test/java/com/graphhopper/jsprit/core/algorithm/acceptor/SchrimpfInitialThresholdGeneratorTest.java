@@ -3,6 +3,7 @@ package com.graphhopper.jsprit.core.algorithm.acceptor;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.GreedySchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmEndsListener;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Service;
@@ -34,9 +35,22 @@ public class SchrimpfInitialThresholdGeneratorTest {
 
         Jsprit.Builder builder = new GreedySchrimpfFactory().createGreedyAlgorithmBuilder(vrp);
         VehicleRoutingAlgorithm vra = builder.buildAlgorithm();
+
+        Listener listener = new Listener();
+        vra.getAlgorithmListeners().addListener(listener);
+
         Collection<VehicleRoutingProblemSolution> solutions = new HashSet<>();
 
         schrimpfInitialThresholdGenerator.informAlgorithmStarts(vrp, vra, solutions);
-        assertTrue(solutions.size() == 1);
+        assertTrue(listener.callsCounter > 0);
+    }
+
+    class Listener implements AlgorithmEndsListener {
+        int callsCounter = 0;
+
+        @Override
+        public void informAlgorithmEnds(VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
+            ++callsCounter;
+        }
     }
 }

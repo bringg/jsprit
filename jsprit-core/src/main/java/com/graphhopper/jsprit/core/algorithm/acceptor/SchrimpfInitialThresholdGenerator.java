@@ -22,6 +22,7 @@ import com.graphhopper.jsprit.core.algorithm.box.GreedySchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmStartsListener;
 import com.graphhopper.jsprit.core.algorithm.listener.IterationEndsListener;
+import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListener;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
@@ -56,7 +57,7 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
         final double[] results = new double[nOfRandomWalks];
 
         Jsprit.Builder builder = new GreedySchrimpfFactory().createGreedyAlgorithmBuilder(problem);
-        builder.setCustomAcceptor(new AcceptNewRemoveFirst(nOfRandomWalks));
+        builder.setCustomAcceptor(new AcceptNewRemoveFirst(1));
         VehicleRoutingAlgorithm vra = builder.buildAlgorithm();
         vra.setMaxIterations(nOfRandomWalks);
         vra.getAlgorithmListeners().addListener(new IterationEndsListener() {
@@ -70,7 +71,10 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
 
         });
 
-        solutions.add(Solutions.bestOf(vra.searchSolutions()));
+        for (VehicleRoutingAlgorithmListener l : algorithm.getAlgorithmListeners().getAlgorithmListeners())
+            vra.getAlgorithmListeners().addListener(l);
+
+        vra.searchSolutions();
 
         StandardDeviation dev = new StandardDeviation();
         double standardDeviation = dev.evaluate(results);
