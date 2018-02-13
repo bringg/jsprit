@@ -76,7 +76,6 @@ public class SchrimpfInitialThresholdGenerator implements AlgorithmStartsListene
             if (l instanceof PrematureAlgorithmTermination)
                 vra.getAlgorithmListeners().addListener(l);
 
-        algorithm.getAlgorithmListeners();
         vra.searchSolutions();
 
         StandardDeviation dev = new StandardDeviation();
