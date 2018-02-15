@@ -97,6 +97,15 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
         insertionsListeners.informJobUnassignedListeners(unassigned, reasons);
     }
 
+    protected void updateUnassignedJobs(List<Job> badJobs, List<Job> jobs, List<ScoredJob> badJobList) {
+        for (ScoredJob bad : badJobList) {
+            Job unassigned = bad.getJob();
+            jobs.remove(unassigned);
+            badJobs.add(unassigned);
+            markUnassigned(unassigned, bad.getInsertionData().getFailedConstraintNames());
+        }
+    }
+
     public abstract Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs);
 
     @Override

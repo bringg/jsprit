@@ -46,9 +46,9 @@ public class RegretInsertion extends AbstractInsertionStrategy {
 
     private static Logger logger = LoggerFactory.getLogger(RegretInsertionFast.class);
 
-    private ScoringFunction scoringFunction;
+    protected ScoringFunction scoringFunction;
 
-    private JobInsertionCostsCalculator insertionCostsCalculator;
+    protected JobInsertionCostsCalculator insertionCostsCalculator;
 
 
     /**
@@ -83,17 +83,63 @@ public class RegretInsertion extends AbstractInsertionStrategy {
      */
     @Override
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> routes, Collection<Job> unassignedJobs) {
-        List<Job> badJobs = new ArrayList<Job>(unassignedJobs.size());
+        List<Job> badJobs = insertBreaks(routes, unassignedJobs);
 
+        List<Job> jobs = new ArrayList<>(unassignedJobs);
+        while (!jobs.isEmpty()) {
+            List<Job> unassignedJobList = new ArrayList<>(jobs);
+            List<ScoredJob> badJobList = new ArrayList<>();
+            ScoredJob bestScoredJob = nextJob(routes, unassignedJobList, badJobList);
+            if (bestScoredJob != null) {
+                insertJob(routes, badJobs, bestScoredJob);
+                jobs.remove(bestScoredJob.getJob());
+            }
+
+            updateUnassignedJobs(badJobs, jobs, badJobList);
+        }
+        return badJobs;
+    }
+
+
+    protected void insertJob(Collection<VehicleRoute> routes, List<Job> badJobs, ScoredJob bestScoredJob) {
+        final VehicleRoute route = bestScoredJob.getRoute();
+        if (bestScoredJob.isNewRoute()) {
+            if (route.getVehicle() != NO_NEW_VEHICLE_YET && route.getVehicle().getBreak() != null) {
+                InsertionData iData = insertionCostsCalculator.getInsertionData(route, route.getVehicle().getBreak(), bestScoredJob.getInsertionData().getSelectedVehicle(), bestScoredJob.getInsertionData().getVehicleDepartureTime(), bestScoredJob.getInsertionData().getSelectedDriver(), Double.MAX_VALUE);
+                if (iData instanceof InsertionData.NoInsertionFound) {
+                    badJobs.add(route.getVehicle().getBreak());
+                } else {
+                    insertJob(route.getVehicle().getBreak(), iData, route);
+                }
+            }
+            routes.add(route);
+        } else if (!(route.getVehicle().getId().equals(bestScoredJob.getInsertionData().getSelectedVehicle().getId()))) {
+            final Break prevBreak = route.getVehicle().getBreak();
+            if (prevBreak != null)
+                route.getTourActivities().removeJob(prevBreak);
+
+            final Break newBreak = bestScoredJob.getInsertionData().getSelectedVehicle().getBreak();
+            if (newBreak != null) {
+                InsertionData iData = insertionCostsCalculator.getInsertionData(route, newBreak, bestScoredJob.getInsertionData().getSelectedVehicle(), bestScoredJob.getInsertionData().getVehicleDepartureTime(), bestScoredJob.getInsertionData().getSelectedDriver(), Double.MAX_VALUE);
+                if (iData instanceof InsertionData.NoInsertionFound) {
+                    badJobs.add(newBreak);
+                } else {
+                    insertJob(newBreak, iData, route);
+                }
+            }
+        }
+
+        insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), route);
+    }
+
+    protected List<Job> insertBreaks(Collection<VehicleRoute> routes, Collection<Job> unassignedJobs) {
+        List<Job> badJobs = new ArrayList<Job>(unassignedJobs.size());
         Iterator<Job> jobIterator = unassignedJobs.iterator();
         while (jobIterator.hasNext()){
             Job job = jobIterator.next();
             if(job instanceof Break){
                 VehicleRoute route = findRoute(routes,job);
-                if(route == null){
-                    badJobs.add(job);
-                }
-                else {
+                if(route != null) {
                     InsertionData iData = insertionCostsCalculator.getInsertionData(route, job, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
                     if (iData instanceof InsertionData.NoInsertionFound) {
                         badJobs.add(job);
@@ -105,25 +151,6 @@ public class RegretInsertion extends AbstractInsertionStrategy {
             }
         }
 
-        List<Job> jobs = new ArrayList<>(unassignedJobs);
-        while (!jobs.isEmpty()) {
-            List<Job> unassignedJobList = new ArrayList<>(jobs);
-            List<ScoredJob> badJobList = new ArrayList<>();
-            ScoredJob bestScoredJob = nextJob(routes, unassignedJobList, badJobList);
-            if (bestScoredJob != null) {
-                if (bestScoredJob.isNewRoute()) {
-                    routes.add(bestScoredJob.getRoute());
-                }
-                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), bestScoredJob.getRoute());
-                jobs.remove(bestScoredJob.getJob());
-            }
-            for (ScoredJob bad : badJobList) {
-                Job unassigned = bad.getJob();
-                jobs.remove(unassigned);
-                badJobs.add(unassigned);
-                markUnassigned(unassigned, bad.getInsertionData().getFailedConstraintNames());
-            }
-        }
         return badJobs;
     }
 
@@ -134,7 +161,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
         return null;
     }
 
-    private ScoredJob nextJob(Collection<VehicleRoute> routes, Collection<Job> unassignedJobList, List<ScoredJob> badJobs) {
+    protected ScoredJob nextJob(final Collection<VehicleRoute> routes, Collection<Job> unassignedJobList, List<ScoredJob> badJobs) {
         ScoredJob bestScoredJob = null;
         for (Job unassignedJob : unassignedJobList) {
             ScoredJob scoredJob = getScoredJob(routes, unassignedJob, insertionCostsCalculator, scoringFunction);
