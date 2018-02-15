@@ -56,7 +56,7 @@ public class VariationCoefficientTermination implements PrematureAlgorithmTermin
 
     private int currentIteration;
 
-    private double[] solutionValues;
+    protected double[] solutionValues;
 
     private VehicleRoutingProblemSolution lastAccepted = null;
 
