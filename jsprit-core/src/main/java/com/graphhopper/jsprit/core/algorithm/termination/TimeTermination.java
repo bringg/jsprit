@@ -70,7 +70,7 @@ public class TimeTermination implements PrematureAlgorithmTermination, Algorithm
     public TimeTermination(long timeThreshold_in_milliseconds) {
         super();
         this.timeThreshold = timeThreshold_in_milliseconds;
-        logger.debug("initialise {}", this);
+        logger.info("initialise {}", this);
     }
 
     public void setTimeGetter(TimeGetter timeGetter) {
@@ -98,6 +98,7 @@ public class TimeTermination implements PrematureAlgorithmTermination, Algorithm
     @Override
     public void informAlgorithmStarts(VehicleRoutingProblem problem, VehicleRoutingAlgorithm algorithm, Collection<VehicleRoutingProblemSolution> solutions) {
         start(timeGetter.getCurrentTime());
+        logger.info("there was informAlgorithmStarts call, start time now: {}", startTime);
     }
 
 }
