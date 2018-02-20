@@ -59,8 +59,10 @@ public class VehicleRoutingAlgorithm {
         @Override
         public boolean isPrematureBreak(DiscoveredSolution discoveredSolution) {
             for (PrematureAlgorithmTermination termination : terminationCriteria) {
-                if (termination.isPrematureBreak(discoveredSolution))
+                if (termination.isPrematureBreak(discoveredSolution)) {
+                    logger.info("PrematureAlgorithmTermination {}", termination);
                     return true;
+                }
             }
             return false;
         }
