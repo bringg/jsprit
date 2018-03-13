@@ -59,6 +59,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VehicleRoutingAlgorithms {
 
@@ -504,7 +505,7 @@ public class VehicleRoutingAlgorithms {
 
     private static VehicleRoutingAlgorithm readAndCreateAlgorithm(final VehicleRoutingProblem vrp, XMLConfiguration config,
                                                                   int nuOfThreads, final SolutionCostCalculator solutionCostCalculator,
-                                                                  final StateManager stateManager, ConstraintManager constraintManager, final ExecutorService executorService,
+                                                                  final StateManager stateManager, ConstraintManager constraintManager, ExecutorService executor,
                                                                   boolean addDefaultCostCalculators, boolean addCoreConstraints) {
         // map to store constructed modules
         TypedMap definedClasses = new TypedMap();
@@ -518,20 +519,23 @@ public class VehicleRoutingAlgorithms {
 
         //threading
 
-        if (executorService == null && nuOfThreads > 0) {
-            log.debug("setup executor-service with " + nuOfThreads + " threads");
+        final ExecutorService executorService;
+        if (executor == null) {
+            executorService = executor;
+        } else if (nuOfThreads > 0) {
+            log.info("setup executor-service with " + nuOfThreads + " threads");
+            executorService = Executors.newFixedThreadPool(nuOfThreads);
             algorithmListeners.add(new PrioritizedVRAListener(Priority.LOW, new AlgorithmEndsListener() {
-
                 @Override
                 public void informAlgorithmEnds(VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
-                    log.debug("shutdown executor-service");
-                    executorService.shutdownNow();
+                    log.info("shutdown executor-service");
+                    executorService.shutdown();
                 }
             }));
             Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread arg0, Throwable arg1) {
-                    log.error("error {}", arg1.toString());
+                    log.error(arg1.toString());
                 }
             });
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -542,8 +546,7 @@ public class VehicleRoutingAlgorithms {
                     }
                 }
             });
-        }
-
+        } else executorService = null;
 
         //create fleetmanager
         final VehicleFleetManager vehicleFleetManager = createFleetManager(vrp);
