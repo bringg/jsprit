@@ -234,12 +234,12 @@ public class VehicleRoutingAlgorithm {
             logger.debug("start iteration: {}", i);
             counter.incCounter();
             SearchStrategy strategy = searchStrategyManager.getRandomStrategy();
-            if (i % 10 == 0) {
+            if (i % 100 == 0) {
                 logger.info("selected strategy {}", strategy.getName());
             }
 
             DiscoveredSolution discoveredSolution = strategy.run(problem, solutions);
-            if (i % 10 == 0) {
+            if (i % 100 == 0) {
                 logger.info("discoveredSolution: cost: {}, routes: {}, unassigned: {}", discoveredSolution.getSolution().getCost(), discoveredSolution.getSolution().getRoutes().size(), discoveredSolution.getSolution().getUnassignedJobs().size());
             }
 
