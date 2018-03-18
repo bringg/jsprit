@@ -115,12 +115,15 @@ public class RegretInsertionConcurrent extends AbstractInsertionStrategy {
             List<ScoredJob> badJobList = new ArrayList<>();
             ScoredJob bestScoredJob = nextJob(routes, unassignedJobList, badJobList);
             if (bestScoredJob != null) {
-                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), bestScoredJob.getRoute());
                 if (bestScoredJob.isNewRoute()) {
-                    insertBreak(insertionCostsCalculator, badJobs, bestScoredJob.getRoute(), bestScoredJob.getInsertionData());
                     routes.add(bestScoredJob.getRoute());
                 }
+                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), bestScoredJob.getRoute());
                 jobs.remove(bestScoredJob.getJob());
+
+                if (bestScoredJob.isNewRoute() || !bestScoredJob.getRoute().getVehicle().getId().equals(bestScoredJob.getInsertionData().getSelectedVehicle().getId())) {
+                    insertBreak(insertionCostsCalculator, badJobs, bestScoredJob.getRoute(), bestScoredJob.getInsertionData());
+                }
             }
             for (ScoredJob bad : badJobList) {
                 Job unassigned = bad.getJob();

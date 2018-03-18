@@ -112,12 +112,15 @@ public class RegretInsertion extends AbstractInsertionStrategy {
             ScoredJob bestScoredJob = nextJob(routes, unassignedJobList, badJobList);
             if (bestScoredJob != null) {
                 final VehicleRoute route = bestScoredJob.getRoute();
-                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), route);
                 if (bestScoredJob.isNewRoute()) {
-                    insertBreak(insertionCostsCalculator, badJobs, route, bestScoredJob.getInsertionData());
                     routes.add(route);
                 }
+                insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), route);
                 jobs.remove(bestScoredJob.getJob());
+
+                if (bestScoredJob.isNewRoute() || !route.getVehicle().getId().equals(bestScoredJob.getInsertionData().getSelectedVehicle().getId())) {
+                    insertBreak(insertionCostsCalculator, badJobs, route, bestScoredJob.getInsertionData());
+                }
             }
             for (ScoredJob bad : badJobList) {
                 Job unassigned = bad.getJob();
