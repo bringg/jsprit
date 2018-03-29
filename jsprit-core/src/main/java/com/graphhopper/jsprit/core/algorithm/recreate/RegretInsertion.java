@@ -119,7 +119,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
                 insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), route);
                 jobs.remove(bestScoredJob.getJob());
 
-                if (bestScoredJob.isNewRoute() || newVehicle) 
+                if (bestScoredJob.isNewRoute() || newVehicle)
                     insertBreak(insertionCostsCalculator, badJobs, route, bestScoredJob.getInsertionData());
             }
             for (ScoredJob bad : badJobList) {
