@@ -119,12 +119,8 @@ public class RegretInsertion extends AbstractInsertionStrategy {
                 insertJob(bestScoredJob.getJob(), bestScoredJob.getInsertionData(), route);
                 jobs.remove(bestScoredJob.getJob());
 
-                if (bestScoredJob.isNewRoute()) {
+                if (bestScoredJob.isNewRoute() || newVehicle) 
                     insertBreak(insertionCostsCalculator, badJobs, route, bestScoredJob.getInsertionData());
-                } else if (newVehicle) {
-                    final InsertionData insertionData = insertBreak(insertionCostsCalculator, badJobs, route, bestScoredJob.getInsertionData());
-                    logger.info("trying to insert break after vehicle switch {}, {}", !(insertionData instanceof InsertionData.NoInsertionFound), insertionData);
-                }
             }
             for (ScoredJob bad : badJobList) {
                 Job unassigned = bad.getJob();
@@ -218,7 +214,6 @@ public class RegretInsertion extends AbstractInsertionStrategy {
         } else scoredJob = new ScoredJob(unassignedJob, score, best, bestRoute, false);
         return scoredJob;
     }
-
 
     static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction) {
         return Scorer.score(unassignedJob,best,secondBest,scoringFunction);
