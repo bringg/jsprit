@@ -145,6 +145,7 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
             }
             return iData;
         }
+        return new InsertionData.NoInsertionFound();
     }
 
 }
