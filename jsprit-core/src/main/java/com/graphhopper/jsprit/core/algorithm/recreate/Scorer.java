@@ -20,12 +20,14 @@ package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.problem.job.Job;
 
+import java.util.Map;
+
 /**
  * Created by schroeder on 24/05/16.
  */
 class Scorer {
 
-    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction){
+    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction, Map<String, Integer> driversCountBySkills){
         if (best == null) {
             throw new IllegalStateException("cannot insert job " + unassignedJob.getId());
         }

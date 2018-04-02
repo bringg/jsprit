@@ -31,10 +31,7 @@ import com.graphhopper.jsprit.core.util.RandomNumberGeneration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public abstract class AbstractInsertionStrategy implements InsertionStrategy {
 
@@ -76,10 +73,24 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
 
     protected VehicleRoutingProblem vrp;
 
+    protected Map<String, Integer> driversCountBySkills = new HashMap<>();
+
     public AbstractInsertionStrategy(VehicleRoutingProblem vrp) {
         this.insertionsListeners = new InsertionListeners();
         this.vrp = vrp;
         eventListeners = new EventListeners();
+        initializeDriversCountBySkills();
+    }
+
+    private void initializeDriversCountBySkills() {
+        for (Vehicle vehicle : vrp.getVehicles()) {
+            for (String skill : vehicle.getSkills().values()) {
+                Integer count = driversCountBySkills.get(skill);
+                if (count == null)
+                    count = 0;
+                driversCountBySkills.put(skill, count + 1);
+            }
+        }
     }
 
     public void setRandom(Random random) {
