@@ -140,7 +140,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
     private ScoredJob nextJob(Collection<VehicleRoute> routes, Collection<Job> unassignedJobList, List<ScoredJob> badJobs) {
         ScoredJob bestScoredJob = null;
         for (Job unassignedJob : unassignedJobList) {
-            ScoredJob scoredJob = getScoredJob(routes, unassignedJob, insertionCostsCalculator, scoringFunction, driversCountBySkills);
+            ScoredJob scoredJob = getScoredJob(routes, unassignedJob, insertionCostsCalculator, scoringFunction, jobCanBeServedByDriversCount);
             if (scoredJob instanceof ScoredJob.BadJob) {
                 badJobs.add(scoredJob);
                 continue;

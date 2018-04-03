@@ -73,7 +73,7 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
 
     protected VehicleRoutingProblem vrp;
 
-    protected Map<String, Integer> driversCountBySkills = new HashMap<>();
+    protected Map<String, Integer> jobCanBeServedByDriversCount = new HashMap<>();
 
     public AbstractInsertionStrategy(VehicleRoutingProblem vrp) {
         this.insertionsListeners = new InsertionListeners();
@@ -83,13 +83,13 @@ public abstract class AbstractInsertionStrategy implements InsertionStrategy {
     }
 
     private void initializeDriversCountBySkills() {
-        for (Vehicle vehicle : vrp.getVehicles()) {
-            for (String skill : vehicle.getSkills().values()) {
-                Integer count = driversCountBySkills.get(skill);
-                if (count == null)
-                    count = 0;
-                driversCountBySkills.put(skill, count + 1);
+        for (Job job : vrp.getJobs().values()) {
+            int count = 0;
+            for (Vehicle vehicle : vrp.getVehicles()) {
+                count += vehicle.getSkills().values().containsAll(job.getRequiredSkills().values()) ? 1 : 0;
             }
+
+            jobCanBeServedByDriversCount.put(job.getId(), count);
         }
     }
 

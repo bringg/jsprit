@@ -146,7 +146,7 @@ public class RegretInsertionFast extends AbstractInsertionStrategy {
 //                updates.put(lastModified,updateRound);
             }
             updateRound++;
-            ScoredJob bestScoredJob = InsertionDataUpdater.getBest(switchAllowed,initialVehicleIds,fleetManager,insertionCostsCalculator,scoringFunction, driversCountBySkills, priorityQueues,updates,unassignedJobList,badJobList);
+            ScoredJob bestScoredJob = InsertionDataUpdater.getBest(switchAllowed,initialVehicleIds,fleetManager,insertionCostsCalculator,scoringFunction, jobCanBeServedByDriversCount, priorityQueues,updates,unassignedJobList,badJobList);
             if (bestScoredJob != null) {
                 if (bestScoredJob.isNewRoute()) {
                     routes.add(bestScoredJob.getRoute());
