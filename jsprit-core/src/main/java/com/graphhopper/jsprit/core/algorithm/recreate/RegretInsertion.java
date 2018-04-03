@@ -25,10 +25,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Insertion based on regret approach.
@@ -67,6 +64,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
         this.scoringFunction = new DefaultScorer(vehicleRoutingProblem);
         this.insertionCostsCalculator = jobInsertionCalculator;
         this.vrp = vehicleRoutingProblem;
+
         logger.debug("initialise {}", this);
     }
 
@@ -142,7 +140,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
     private ScoredJob nextJob(Collection<VehicleRoute> routes, Collection<Job> unassignedJobList, List<ScoredJob> badJobs) {
         ScoredJob bestScoredJob = null;
         for (Job unassignedJob : unassignedJobList) {
-            ScoredJob scoredJob = getScoredJob(routes, unassignedJob, insertionCostsCalculator, scoringFunction);
+            ScoredJob scoredJob = getScoredJob(routes, unassignedJob, insertionCostsCalculator, scoringFunction, jobCanBeServedByDriversCount);
             if (scoredJob instanceof ScoredJob.BadJob) {
                 badJobs.add(scoredJob);
                 continue;
@@ -161,7 +159,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
         return bestScoredJob;
     }
 
-    static ScoredJob getScoredJob(Collection<VehicleRoute> routes, Job unassignedJob, JobInsertionCostsCalculator insertionCostsCalculator, ScoringFunction scoringFunction) {
+    static ScoredJob getScoredJob(Collection<VehicleRoute> routes, Job unassignedJob, JobInsertionCostsCalculator insertionCostsCalculator, ScoringFunction scoringFunction, Map<String, Integer> driversCountBySkills) {
         InsertionData best = null;
         InsertionData secondBest = null;
         VehicleRoute bestRoute = null;
@@ -207,7 +205,7 @@ public class RegretInsertion extends AbstractInsertionStrategy {
             ScoredJob.BadJob badJob = new ScoredJob.BadJob(unassignedJob, failedConstraintNames);
             return badJob;
         }
-        double score = score(unassignedJob, best, secondBest, scoringFunction);
+        double score = score(unassignedJob, best, secondBest, scoringFunction, driversCountBySkills);
         ScoredJob scoredJob;
         if (bestRoute == emptyRoute) {
             scoredJob = new ScoredJob(unassignedJob, score, best, bestRoute, true);
@@ -215,8 +213,8 @@ public class RegretInsertion extends AbstractInsertionStrategy {
         return scoredJob;
     }
 
-    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction) {
-        return Scorer.score(unassignedJob,best,secondBest,scoringFunction);
+    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction, Map<String, Integer> driversCountBySkills) {
+        return Scorer.score(unassignedJob,best,secondBest,scoringFunction, driversCountBySkills);
     }
 
 

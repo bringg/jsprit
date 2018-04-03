@@ -71,7 +71,7 @@ class InsertionDataUpdater {
         };
     }
 
-    static ScoredJob getBest(boolean switchAllowed, Set<String> initialVehicleIds, VehicleFleetManager fleetManager, JobInsertionCostsCalculator insertionCostsCalculator, ScoringFunction scoringFunction, TreeSet<VersionedInsertionData>[] priorityQueues, Map<VehicleRoute, Integer> updates, List<Job> unassignedJobList, List<ScoredJob> badJobs) {
+    static ScoredJob getBest(boolean switchAllowed, Set<String> initialVehicleIds, VehicleFleetManager fleetManager, JobInsertionCostsCalculator insertionCostsCalculator, ScoringFunction scoringFunction, Map<String, Integer> driversCountBySkills, TreeSet<VersionedInsertionData>[] priorityQueues, Map<VehicleRoute, Integer> updates, List<Job> unassignedJobList, List<ScoredJob> badJobs) {
         ScoredJob bestScoredJob = null;
         for(Job j : unassignedJobList){
             VehicleRoute bestRoute = null;
@@ -145,7 +145,7 @@ class InsertionDataUpdater {
                 badJobs.add(new ScoredJob.BadJob(j, failedConstraintNames));
                 continue;
             }
-            double score = score(j, best, secondBest, scoringFunction);
+            double score = score(j, best, secondBest, scoringFunction, driversCountBySkills);
             ScoredJob scoredJob;
             if (bestRoute == emptyRoute) {
                 scoredJob = new ScoredJob(j, score, best, bestRoute, true);
@@ -161,8 +161,8 @@ class InsertionDataUpdater {
         return bestScoredJob;
     }
 
-    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction) {
-        return Scorer.score(unassignedJob,best,secondBest,scoringFunction);
+    static double score(Job unassignedJob, InsertionData best, InsertionData secondBest, ScoringFunction scoringFunction, Map<String, Integer> driversCountBySkills) {
+        return Scorer.score(unassignedJob,best,secondBest,scoringFunction, driversCountBySkills);
     }
 
 }
