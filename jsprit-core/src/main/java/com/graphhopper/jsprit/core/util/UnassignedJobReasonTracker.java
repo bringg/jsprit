@@ -23,6 +23,7 @@ import com.graphhopper.jsprit.core.problem.job.Job;
 import org.apache.commons.math3.stat.Frequency;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by schroeder on 06/02/17.
@@ -48,7 +49,7 @@ public class UnassignedJobReasonTracker implements JobUnassignedListener {
         return mostLikely;
     }
 
-    Map<String, Frequency> failedConstraintNamesFrequencyMapping = new HashMap<>();
+    Map<String, Frequency> failedConstraintNamesFrequencyMapping = new ConcurrentHashMap<>();
 
     Map<Integer, String> codesToHumanReadableReason = new HashMap<>();
 
