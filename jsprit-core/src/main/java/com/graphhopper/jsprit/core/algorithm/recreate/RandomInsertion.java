@@ -56,43 +56,38 @@ public class RandomInsertion extends AbstractInsertionStrategy {
             });
 
         for (Job unassignedJob : unassignedJobList) {
-            List<Insertion> possibleInsertions = new ArrayList<>();
+            List<VehicleRoute> routes = new ArrayList<>(vehicleRoutes);
+            final VehicleRoute newRoute = VehicleRoute.emptyRoute();
+            routes.add(newRoute);
+            Collections.shuffle(routes, random);
+
             InsertionData empty = new InsertionData.NoInsertionFound();
             double bestInsertionCost = Double.MAX_VALUE;
-            for (VehicleRoute vehicleRoute : vehicleRoutes) {
+            boolean inserted = false;
+            for (VehicleRoute vehicleRoute : routes) {
                 InsertionData iData = bestInsertionCostCalculator.getInsertionData(vehicleRoute, unassignedJob, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, bestInsertionCost);
                 if (iData instanceof InsertionData.NoInsertionFound) {
                     empty.getFailedConstraintNames().addAll(iData.getFailedConstraintNames());
                     continue;
                 }
-                possibleInsertions.add(new Insertion(vehicleRoute, iData));
-            }
-            VehicleRoute newRoute = VehicleRoute.emptyRoute();
-            InsertionData newIData = bestInsertionCostCalculator.getInsertionData(newRoute, unassignedJob, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, bestInsertionCost);
-            boolean isNewRoute = false;
-            if (newIData instanceof InsertionData.NoInsertionFound)
-                empty.getFailedConstraintNames().addAll(newIData.getFailedConstraintNames());
-            else {
-                updateNewRouteInsertionData(newIData);
-                possibleInsertions.add(new Insertion(newRoute, newIData));
-            }
 
-            if (possibleInsertions.isEmpty()) {
-                badJobs.add(unassignedJob);
-                markUnassigned(unassignedJob, empty.getFailedConstraintNames());
-            } else {
-                Collections.shuffle(possibleInsertions, random);
-                AbstractInsertionStrategy.Insertion bestInsertion = possibleInsertions.get(0);
-                if (bestInsertion.getRoute().equals(newRoute))
-                    vehicleRoutes.add(bestInsertion.getRoute());
-                final boolean newVehicle = !bestInsertion.getRoute().getVehicle().getId().equals(bestInsertion.getInsertionData().getSelectedVehicle().getId());
-                insertJob(unassignedJob, bestInsertion.getInsertionData(), bestInsertion.getRoute());
-
-                if (isNewRoute || newVehicle) {
-                    insertBreak(bestInsertionCostCalculator, badJobs, bestInsertion.getRoute(), bestInsertion.getInsertionData());
+                inserted = true;
+                final boolean isNewRoute = vehicleRoute.getActivities().size() == 0;
+                if (isNewRoute) {
+                    updateNewRouteInsertionData(iData);
+                    vehicleRoutes.add(vehicleRoute);
                 }
+                if (!vehicleRoute.getVehicle().getId().equals(iData.getSelectedVehicle().getId()))
+                    insertBreak(bestInsertionCostCalculator, badJobs, vehicleRoute, iData);
+
+                insertJob(unassignedJob, iData, vehicleRoute);
+                break;
             }
 
+            if (!inserted) {
+                markUnassigned(unassignedJob, empty.getFailedConstraintNames());
+                badJobs.add(unassignedJob);
+            }
         }
         return badJobs;
     }
