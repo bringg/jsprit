@@ -77,10 +77,11 @@ public class RandomInsertion extends AbstractInsertionStrategy {
                     updateNewRouteInsertionData(iData);
                     vehicleRoutes.add(vehicleRoute);
                 }
-                if (!vehicleRoute.getVehicle().getId().equals(iData.getSelectedVehicle().getId()))
-                    insertBreak(bestInsertionCostCalculator, badJobs, vehicleRoute, iData);
 
+                final boolean vehicleSwitched = !vehicleRoute.getVehicle().getId().equals(iData.getSelectedVehicle().getId());
                 insertJob(unassignedJob, iData, vehicleRoute);
+                if (vehicleSwitched)
+                    insertBreak(bestInsertionCostCalculator, badJobs, vehicleRoute, iData);
                 break;
             }
 
