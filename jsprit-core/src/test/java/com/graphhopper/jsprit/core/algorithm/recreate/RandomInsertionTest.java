@@ -2,6 +2,7 @@ package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.Delivery;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
@@ -24,8 +25,8 @@ public class RandomInsertionTest {
         final HashSet<String> first = new HashSet<>(); first.add("C");
         final HashSet<String> second = new HashSet<>(); second.add("A");second.add("B");
         final VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance().setFleetSize(VehicleRoutingProblem.FleetSize.FINITE)
-            .addVehicle(getVehicle("v1", Location.newInstance(0, 0), 0, 100, 20, first, false, 1, 1))
-            .addVehicle(getVehicle("v2", Location.newInstance(0, 14), 0, 100, 20, second, false, 1, 1))
+            .addVehicle(getVehicle("v1", Location.newInstance(0, 0), 0, 100, 20, first, false, 1, 1, false))
+            .addVehicle(getVehicle("v2", Location.newInstance(0, 14), 0, 100, 20, second, false, 1, 1, false))
             .addJob(getService(Location.newInstance(0, 5), 0, 20, new HashSet<String>(), 1))
             .addJob(getService(Location.newInstance(0, 6), 0, 20, new HashSet<String>(), 1));
 
@@ -37,12 +38,36 @@ public class RandomInsertionTest {
     }
 
     @Test
+    public void initBreaksCanBeServedByOneDriver() {
+        final HashSet<String> first = new HashSet<>(); first.add("C");
+        final HashSet<String> second = new HashSet<>(); second.add("A");second.add("B");
+        final VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance().setFleetSize(VehicleRoutingProblem.FleetSize.FINITE)
+            .addVehicle(getVehicle("v1", Location.newInstance(0, 0), 0, 100, 20, first, false, 1, 1, true))
+            .addVehicle(getVehicle("v2", Location.newInstance(0, 14), 0, 100, 20, second, false, 1, 1, true))
+            .addJob(getService(Location.newInstance(0, 5), 0, 20, new HashSet<String>(), 1))
+            .addJob(getService(Location.newInstance(0, 6), 0, 20, new HashSet<String>(), 1));
+
+        final RandomInsertion randomInsertion = new RandomInsertion(null, builder.build());
+        final Map<String, Integer> jobCanBeServedByDriversCount = randomInsertion.jobCanBeServedByDriversCount;
+
+        int numBreaks = 0;
+        for (Map.Entry<String, Integer> entry : jobCanBeServedByDriversCount.entrySet()) {
+            if (entry.getKey().contains("break_")) {
+                ++numBreaks;
+                assertEquals((int) entry.getValue(), 1);
+            }
+        }
+
+        assertEquals(numBreaks, 2);
+    }
+
+    @Test
     public void initJobsCanBeServedByNumDrivers2() {
         final HashSet<String> first = new HashSet<>(); first.add("C");
         final HashSet<String> second = new HashSet<>(); second.add("A");second.add("B");
         final VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance().setFleetSize(VehicleRoutingProblem.FleetSize.FINITE)
-            .addVehicle(getVehicle("v1", Location.newInstance(0, 0), 0, 100, 20, first, false, 1, 1))
-            .addVehicle(getVehicle("v2", Location.newInstance(0, 14), 0, 100, 20, second, false, 1, 1))
+            .addVehicle(getVehicle("v1", Location.newInstance(0, 0), 0, 100, 20, first, false, 1, 1, false))
+            .addVehicle(getVehicle("v2", Location.newInstance(0, 14), 0, 100, 20, second, false, 1, 1, false))
             .addJob(getService(Location.newInstance(0, 5), 0, 20, first, 1))
             .addJob(getService(Location.newInstance(0, 6), 0, 20, second, 1));
 
@@ -65,12 +90,16 @@ public class RandomInsertionTest {
 
     }
 
-    private static Vehicle getVehicle(String id, Location location, int start, int end, int capacity, Set<String> skills, boolean returnToDepot, int fixedCost, int costPerDistance) {
-        return VehicleImpl.Builder.newInstance(id)
+    private static Vehicle getVehicle(String id, Location location, int start, int end, int capacity, Set<String> skills, boolean returnToDepot, int fixedCost, int costPerDistance, boolean aBreak) {
+        final VehicleImpl.Builder builder = VehicleImpl.Builder.newInstance(id)
             .setStartLocation(location).setLatestArrival(end).setEarliestStart(start).setType(
                 VehicleTypeImpl.Builder.newInstance(UUID.randomUUID().toString()).setFixedCost(fixedCost).setCostPerDistance(costPerDistance).addCapacityDimension(0, capacity).build()
             )
-            .addAllSkills(skills).setReturnToDepot(returnToDepot).build();
+            .addAllSkills(skills).setReturnToDepot(returnToDepot);
+
+        if (aBreak)
+            builder.setBreak(Break.Builder.newInstance("break_" + id).build());
+        return builder.build();
 
     }
 

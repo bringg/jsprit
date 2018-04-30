@@ -34,7 +34,7 @@ public class RandomInsertion extends AbstractInsertionStrategy {
             }
             jobCanBeServedByDriversCount.put(job.getId(), count);
         }
-        
+
         for (Vehicle vehicle : vrp.getVehicles()) {
             final Break aBreak = vehicle.getBreak();
             if (aBreak != null)
