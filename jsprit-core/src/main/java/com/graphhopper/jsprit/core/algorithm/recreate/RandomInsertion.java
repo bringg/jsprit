@@ -27,11 +27,9 @@ public class RandomInsertion extends AbstractInsertionStrategy {
     void initJobsCanBeServedByNumDrivers() {
         for (Job job : vrp.getJobs().values()) {
             int count = 0;
-            for (Vehicle vehicle : vrp.getVehicles()) {
-                final HashSet<String> jobSkills = new HashSet<>(job.getRequiredSkills().values());
-                jobSkills.removeAll(vehicle.getSkills().values());
-                count += jobSkills.isEmpty() ? 1 : 0;
-            }
+            for (Vehicle vehicle : vrp.getVehicles())
+                count += vehicle.getSkills().values().containsAll(job.getRequiredSkills().values()) ? 1 : 0;
+
             jobCanBeServedByDriversCount.put(job.getId(), count);
         }
 
