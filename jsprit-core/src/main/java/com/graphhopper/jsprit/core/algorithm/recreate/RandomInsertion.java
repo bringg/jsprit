@@ -1,6 +1,7 @@
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
@@ -32,6 +33,12 @@ public class RandomInsertion extends AbstractInsertionStrategy {
                 count += jobSkills.isEmpty() ? 1 : 0;
             }
             jobCanBeServedByDriversCount.put(job.getId(), count);
+        }
+        
+        for (Vehicle vehicle : vrp.getVehicles()) {
+            final Break aBreak = vehicle.getBreak();
+            if (aBreak != null)
+                jobCanBeServedByDriversCount.put(aBreak.getId(), 1);
         }
     }
 
