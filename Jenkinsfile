@@ -16,7 +16,7 @@ pipeline {
             post {
                 always {
                     junit(testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true)
-                    sh 'apt-get install -qq --no-install-recommends bash curl'
+                    sh 'sudo apt-get install -qq --no-install-recommends bash curl || echo'
                     sh 'curl -s https://codecov.io/bash | bash'
                 }
             }
