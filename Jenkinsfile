@@ -12,11 +12,11 @@ pipeline {
             }
             steps {
                 sh 'mvn test'
+                sh 'curl -s https://codecov.io/bash | bash'
             }
             post {
                 always {
                     junit(testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true)
-                    sh 'curl -s https://codecov.io/bash | bash'
                 }
             }
         }
