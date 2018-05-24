@@ -318,8 +318,11 @@ public class VehicleRoutingProblem {
                 if (act instanceof TourActivity.JobActivity) {
                     Job job = ((TourActivity.JobActivity) act).getJob();
                     jobsInInitialRoutes.add(job.getId());
-                    addLocationToTentativeLocations(job);
                     registerJobAndActivity(abstractAct, job);
+
+                    if (act instanceof BreakActivity)
+                        continue;
+                    addLocationToTentativeLocations(job);
                 }
             }
             initialRoutes.add(route);
@@ -510,6 +513,10 @@ public class VehicleRoutingProblem {
          */
         public Collection<Job> getAddedJobs() {
             return Collections.unmodifiableCollection(tentativeJobs.values());
+        }
+
+        public Map<String, Job> getAddedJobsWithIds() {
+            return tentativeJobs;
         }
 
         private Builder addService(Service service) {
