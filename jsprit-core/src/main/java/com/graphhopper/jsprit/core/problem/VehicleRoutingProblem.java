@@ -515,10 +515,6 @@ public class VehicleRoutingProblem {
             return Collections.unmodifiableCollection(tentativeJobs.values());
         }
 
-        public Map<String, Job> getAddedJobsWithIds() {
-            return tentativeJobs;
-        }
-
         private Builder addService(Service service) {
 //            tentative_coordinates.put(service.getLocation().getId(), service.getLocation().getCoordinate());
             addLocationToTentativeLocations(service);
