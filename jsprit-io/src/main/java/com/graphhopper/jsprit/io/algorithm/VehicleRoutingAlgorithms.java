@@ -890,10 +890,12 @@ public class VehicleRoutingAlgorithms {
             } else if (ruin_name.equals("clusterRuin")) {
                 String initialNumberJobsToRemoveString = moduleConfig.getString("ruin.initRemoveJobs");
                 String shareFactor = moduleConfig.getString("ruin.share");
-                if (initialNumberJobsToRemoveString == null && shareFactor == null) throw new IllegalStateException("module.ruin.initRemoveJobs is missing.");
-                int initialNumberJobsToRemove = Integer.valueOf(initialNumberJobsToRemoveString);
-                if (shareFactor != null)
+                int initialNumberJobsToRemove;
+                if (initialNumberJobsToRemoveString != null) 
+                    initialNumberJobsToRemove = Integer.valueOf(initialNumberJobsToRemoveString);
+                else if(shareFactor != null)
                     initialNumberJobsToRemove = (int) (Double.valueOf(shareFactor) * vrp.getJobs().size());
+                else throw new IllegalStateException("module.ruin.initRemoveJobs is missing.");
                 ruin = getClusterRuin(vrp, routeStates, definedClasses, ruinKey, initialNumberJobsToRemove);
             } else throw new IllegalStateException("ruin[@name] " + ruin_name + " is not known. Use either randomRuin or radialRuin.");
 
