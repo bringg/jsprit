@@ -139,7 +139,7 @@ public class SchrimpfAcceptance implements SolutionAcceptor, IterationStartsList
 
     @Override
     public String toString() {
-        return "[name=SchrimpfAcceptance][alpha=" + alpha + "]";
+        return "[name=SchrimpfAcceptance][alpha==" + alpha + "]";
     }
 
     private double getThreshold(int iteration) {
