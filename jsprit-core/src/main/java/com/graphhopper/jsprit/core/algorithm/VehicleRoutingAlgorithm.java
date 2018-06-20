@@ -218,16 +218,25 @@ public class VehicleRoutingAlgorithm {
     }
 
     public Collection<VehicleRoutingProblemSolution> searchSolutions(Collection<VehicleRoutingProblemSolution> solutions) {
+        return searchSolutions(solutions,true);
+    }
+
+
+    public Collection<VehicleRoutingProblemSolution> searchSolutions(Collection<VehicleRoutingProblemSolution> solutions, boolean runInitialSolution) {
         logger.debug("algorithm starts: [maxIterations={}]", maxIterations);
         double now = System.currentTimeMillis();
         int noIterationsThisAlgoIsRunning = maxIterations;
         counter.reset();
-        logger.debug("algorithmStarts func call");
-        algorithmStarts(problem, solutions);
-        bestEver = Solutions.bestOf(solutions);
-        logger.debug("algorithm iterations start");
-        if (logger.isTraceEnabled()) {
-            log(solutions);
+        if(runInitialSolution || solutions.isEmpty()) {
+            logger.debug("algorithmStarts func call");
+            algorithmStarts(problem, solutions);
+            bestEver = Solutions.bestOf(solutions);
+            logger.debug("algorithm iterations start");
+            if (logger.isTraceEnabled()) {
+                log(solutions);
+            }
+        } else {
+            bestEver = Solutions.bestOf(solutions);
         }
         for (int i = 0; i < maxIterations; i++) {
             iterationStarts(i + 1, problem, solutions);
