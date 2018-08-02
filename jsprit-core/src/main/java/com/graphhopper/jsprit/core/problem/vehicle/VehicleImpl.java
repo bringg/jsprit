@@ -351,7 +351,7 @@ public class VehicleImpl extends AbstractVehicle {
 
     private final Set<String> prohibitedTasks;
 
-    private VehicleImpl(Builder builder) {
+    protected VehicleImpl(Builder builder) {
         setUserData(builder.userData);
         id = builder.id;
         type = builder.type;
