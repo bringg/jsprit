@@ -146,7 +146,7 @@ public class VehicleImpl extends AbstractVehicle {
 
         private Set<String> prohibitedTasks = new HashSet<>();
 
-        private Builder(String id) {
+        protected Builder(String id) {
             super();
             this.id = id;
             if (id == null) throw new IllegalArgumentException("Vehicle id must not be null.");
