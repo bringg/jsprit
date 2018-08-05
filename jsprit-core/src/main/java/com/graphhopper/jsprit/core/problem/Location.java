@@ -161,7 +161,7 @@ public final class Location implements HasIndex, HasId {
 
     private Object userData;
 
-    private Location(Builder builder) {
+    protected Location(Builder builder) {
         this.userData = builder.userData;
         this.index = builder.index;
         this.coordinate = builder.coordinate;
