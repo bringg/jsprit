@@ -195,6 +195,8 @@ public class Jsprit {
             defaults.put(Strategy.STRING_BEST.toString(), "0.0");
             defaults.put(Strategy.STRING_REGRET.toString(), "0.0");
 
+            defaults.put(Strategy.RANDOM.toString(), "0.0");
+
             defaults.put(Parameter.STRING_K_MIN.toString(), "1");
             defaults.put(Parameter.STRING_K_MAX.toString(), "6");
             defaults.put(Parameter.STRING_L_MIN.toString(), "10");
@@ -226,6 +228,8 @@ public class Jsprit {
             defaults.put(Parameter.RANDOM_REGRET_MAX_SHARE.toString(), String.valueOf(maxShare_));
             defaults.put(Parameter.RANDOM_BEST_MIN_SHARE.toString(), String.valueOf(minShare_));
             defaults.put(Parameter.RANDOM_BEST_MAX_SHARE.toString(), String.valueOf(maxShare_));
+            defaults.put(Parameter.RANDOM_RANDOM_MIN_SHARE.toString(), String.valueOf(maxShare_));
+            defaults.put(Parameter.RANDOM_RANDOM_MAX_SHARE.toString(), String.valueOf(maxShare_));
             defaults.put(Parameter.THRESHOLD_ALPHA.toString(), String.valueOf(0.15));
             defaults.put(Parameter.THRESHOLD_INI.toString(), String.valueOf(0.03));
             defaults.put(Parameter.INSERTION_NOISE_LEVEL.toString(), String.valueOf(0.15));
