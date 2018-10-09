@@ -484,8 +484,8 @@ public class Jsprit {
         );
 
         final RuinRandom random_for_random = new RuinRandom(vrp, 0.5);
-        random_for_best.setRandom(random);
-        random_for_best.setRuinShareFactory(new RuinShareFactoryImpl(
+        random_for_random.setRandom(random);
+        random_for_random.setRuinShareFactory(new RuinShareFactoryImpl(
             toInteger(properties.getProperty(Parameter.RANDOM_RANDOM_MIN_SHARE.toString())),
             toInteger(properties.getProperty(Parameter.RANDOM_RANDOM_MAX_SHARE.toString())),
             random)
