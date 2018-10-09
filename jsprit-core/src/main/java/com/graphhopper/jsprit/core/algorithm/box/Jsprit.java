@@ -83,7 +83,7 @@ public class Jsprit {
         CLUSTER_REGRET("cluster_regret"),
         STRING_BEST("string_best"),
         STRING_REGRET("string_regret"),
-        RADIAL_RANDOM("radial_random");
+        RANDOM("random");
 
         String strategyName;
 
@@ -669,8 +669,8 @@ public class Jsprit {
         SearchStrategy stringBest = new SearchStrategy(Strategy.STRING_BEST.toString(), new SelectBest(), acceptor, objectiveFunction);
         stringBest.addModule(new RuinAndRecreateModule(Strategy.STRING_BEST.toString(), best, stringRuin));
 
-        final SearchStrategy randomStrategy = new SearchStrategy(Strategy.RADIAL_RANDOM.toString(), new SelectBest(), acceptor, objectiveFunction);
-        randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RADIAL_BEST.toString(), randomInsertion, random_for_random));
+        final SearchStrategy randomStrategy = new SearchStrategy(Strategy.RANDOM.toString(), new SelectBest(), acceptor, objectiveFunction);
+        randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), randomInsertion, random_for_random));
 
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
@@ -688,7 +688,7 @@ public class Jsprit {
             .withStrategy(clusters_best, toDouble(getProperty(Strategy.CLUSTER_BEST.toString())))
             .withStrategy(stringBest, toDouble(getProperty(Strategy.STRING_BEST.toString())))
             .withStrategy(stringRegret, toDouble(getProperty(Strategy.STRING_REGRET.toString())))
-            .withStrategy(randomStrategy, toDouble((getProperty(Strategy.RADIAL_RANDOM.toString()))));
+            .withStrategy(randomStrategy, toDouble((getProperty(Strategy.RANDOM.toString()))));
 
         for (SearchStrategy customStrategy : customStrategies.keySet()) {
             prettyBuilder.withStrategy(customStrategy, customStrategies.get(customStrategy));
