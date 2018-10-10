@@ -30,6 +30,7 @@ import com.graphhopper.jsprit.core.algorithm.recreate.*;
 import com.graphhopper.jsprit.core.algorithm.ruin.*;
 import com.graphhopper.jsprit.core.algorithm.ruin.distance.AvgServiceAndShipmentDistance;
 import com.graphhopper.jsprit.core.algorithm.selector.SelectBest;
+import com.graphhopper.jsprit.core.algorithm.selector.SelectRandomly;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -228,7 +229,7 @@ public class Jsprit {
             defaults.put(Parameter.RANDOM_REGRET_MAX_SHARE.toString(), String.valueOf(maxShare_));
             defaults.put(Parameter.RANDOM_BEST_MIN_SHARE.toString(), String.valueOf(minShare_));
             defaults.put(Parameter.RANDOM_BEST_MAX_SHARE.toString(), String.valueOf(maxShare_));
-            defaults.put(Parameter.RANDOM_RANDOM_MIN_SHARE.toString(), String.valueOf(maxShare_));
+            defaults.put(Parameter.RANDOM_RANDOM_MIN_SHARE.toString(), String.valueOf(minShare_));
             defaults.put(Parameter.RANDOM_RANDOM_MAX_SHARE.toString(), String.valueOf(maxShare_));
             defaults.put(Parameter.THRESHOLD_ALPHA.toString(), String.valueOf(0.15));
             defaults.put(Parameter.THRESHOLD_INI.toString(), String.valueOf(0.03));
@@ -673,7 +674,7 @@ public class Jsprit {
         SearchStrategy stringBest = new SearchStrategy(Strategy.STRING_BEST.toString(), new SelectBest(), acceptor, objectiveFunction);
         stringBest.addModule(new RuinAndRecreateModule(Strategy.STRING_BEST.toString(), best, stringRuin));
 
-        final SearchStrategy randomStrategy = new SearchStrategy(Strategy.RANDOM.toString(), new SelectBest(), acceptor, objectiveFunction);
+        final SearchStrategy randomStrategy = new SearchStrategy(Strategy.RANDOM.toString(), new SelectRandomly(), acceptor, objectiveFunction);
         randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), randomInsertion, random_for_random));
 
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
