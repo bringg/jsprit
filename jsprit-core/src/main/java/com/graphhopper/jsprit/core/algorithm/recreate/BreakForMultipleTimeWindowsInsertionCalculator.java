@@ -112,7 +112,11 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
                 tourEnd = true;
             }
             boolean breakThis = true;
-            breakAct2Insert.setLocation(prevAct.getLocation());
+            if (newVehicle.isReturnToDepot())
+                breakAct2Insert.setLocation(newVehicle.getEndLocation());
+            else
+                breakAct2Insert.setLocation(prevAct.getLocation());
+
             breakAct2Insert.setTheoreticalEarliestOperationStartTime(breakToInsert.getTimeWindow().getStart());
             breakAct2Insert.setTheoreticalLatestOperationStartTime(breakToInsert.getTimeWindow().getEnd());
             HardActivityConstraint.ConstraintsStatus status = hardActivityLevelConstraint.fulfilled(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
