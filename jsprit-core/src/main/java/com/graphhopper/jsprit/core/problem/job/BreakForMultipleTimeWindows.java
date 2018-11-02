@@ -1,11 +1,8 @@
 package com.graphhopper.jsprit.core.problem.job;
 
-import com.graphhopper.jsprit.core.problem.Capacity;
-import com.graphhopper.jsprit.core.problem.Skills;
+public class BreakForMultipleTimeWindows extends Break {
 
-public class BreakForMultipleTimeWindows extends Service {
-
-    public static class Builder extends Service.Builder<BreakForMultipleTimeWindows> {
+    public static class Builder extends Break.Builder {
 
         /**
          * Returns a new instance of builder that builds a pickup.
@@ -16,8 +13,6 @@ public class BreakForMultipleTimeWindows extends Service {
         public static BreakForMultipleTimeWindows.Builder newInstance(String id) {
             return new BreakForMultipleTimeWindows.Builder(id);
         }
-
-        private boolean variableLocation = true;
 
         Builder(String id) {
             super(id);
@@ -32,27 +27,13 @@ public class BreakForMultipleTimeWindows extends Service {
          * @throws IllegalStateException if neither locationId nor coordinate has been set
          */
         public BreakForMultipleTimeWindows build() {
-            if (location != null) {
-                variableLocation = false;
-            }
-            this.setType("break");
-            super.capacity = Capacity.Builder.newInstance().build();
-            super.skills = Skills.Builder.newInstance().build();
+            super.build();
             return new BreakForMultipleTimeWindows(this);
         }
 
     }
 
-    private boolean variableLocation = true;
-
     BreakForMultipleTimeWindows(BreakForMultipleTimeWindows.Builder builder) {
         super(builder);
-        this.variableLocation = builder.variableLocation;
     }
-
-    public boolean hasVariableLocation() {
-        return variableLocation;
-    }
-
-
 }
