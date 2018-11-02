@@ -165,7 +165,8 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
             if(not_fulfilled_break) break;
             double nextActArrTime = prevActStartTime + transportCosts.getTransportTime(prevAct.getLocation(), nextAct.getLocation(), prevActStartTime, newDriver, newVehicle);
             prevActStartTime = Math.max(nextActArrTime, nextAct.getTheoreticalEarliestOperationStartTime()) + activityCosts.getActivityDuration(prevAct, nextAct,nextActArrTime,newDriver,newVehicle);
-            prevAct = nextAct;
+            if (!nextAct.getName().equals("break"))
+                prevAct = nextAct;
             actIndex++;
         }
         if(insertionIndex == InsertionData.NO_INDEX) {
