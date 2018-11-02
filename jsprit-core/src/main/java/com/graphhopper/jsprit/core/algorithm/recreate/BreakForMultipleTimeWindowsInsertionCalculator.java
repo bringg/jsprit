@@ -5,7 +5,6 @@ import com.graphhopper.jsprit.core.problem.constraint.*;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
-import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.BreakForMultipleTimeWindows;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
@@ -69,7 +68,7 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
      */
     @Override
     public InsertionData getInsertionData(final VehicleRoute currentRoute, final Job jobToInsert, final Vehicle newVehicle, double newVehicleDepartureTime, final Driver newDriver, final double bestKnownCosts) {
-        Break breakToInsert = (BreakForMultipleTimeWindows) jobToInsert;
+        BreakForMultipleTimeWindows breakToInsert = (BreakForMultipleTimeWindows) jobToInsert;
 
         JobInsertionContext insertionContext = new JobInsertionContext(currentRoute, jobToInsert, newVehicle, newDriver, newVehicleDepartureTime);
         int insertionIndex = InsertionData.NO_INDEX;
