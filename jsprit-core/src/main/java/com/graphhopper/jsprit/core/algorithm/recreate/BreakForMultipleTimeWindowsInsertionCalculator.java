@@ -1,6 +1,7 @@
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.problem.JobActivityFactory;
+import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.constraint.*;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
@@ -9,7 +10,10 @@ import com.graphhopper.jsprit.core.problem.job.BreakForMultipleTimeWindows;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.BreakForMultipleTimeWindowsActivity;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.End;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.Start;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +70,7 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
     @Override
     public InsertionData getInsertionData(final VehicleRoute currentRoute, final Job jobToInsert, final Vehicle newVehicle, double newVehicleDepartureTime, final Driver newDriver, final double bestKnownCosts) {
         BreakForMultipleTimeWindows breakToInsert = (BreakForMultipleTimeWindows) jobToInsert;
+        if (currentRoute.isEmpty()) return InsertionData.createEmptyInsertionData();
 
         JobInsertionContext insertionContext = new JobInsertionContext(currentRoute, jobToInsert, newVehicle, newDriver, newVehicleDepartureTime);
         int insertionIndex = InsertionData.NO_INDEX;
@@ -95,6 +100,8 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
         start.setEndTime(newVehicleDepartureTime);
         End end = new End(newVehicle.getEndLocation(), 0.0, newVehicle.getLatestArrival());
 
+        Location bestLocation = null;
+
         TourActivity prevAct = start;
         double prevActStartTime = newVehicleDepartureTime;
         int actIndex = 0;
@@ -108,11 +115,7 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
                 tourEnd = true;
             }
             boolean breakThis = true;
-            if (newVehicle.isReturnToDepot())
-                breakAct2Insert.setLocation(newVehicle.getEndLocation());
-            else
-                breakAct2Insert.setLocation(prevAct.getLocation());
-
+            breakAct2Insert.setLocation(prevAct.getLocation());
             breakAct2Insert.setTheoreticalEarliestOperationStartTime(breakToInsert.getTimeWindow().getStart());
             breakAct2Insert.setTheoreticalLatestOperationStartTime(breakToInsert.getTimeWindow().getEnd());
             HardActivityConstraint.ConstraintsStatus status = hardActivityLevelConstraint.fulfilled(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
@@ -123,11 +126,13 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
                 if (additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts < bestCost) {
                     bestCost = additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts;
                     insertionIndex = actIndex;
+                    bestLocation = prevAct.getLocation();
                 }
                 breakThis = false;
             } else if (status.equals(HardActivityConstraint.ConstraintsStatus.NOT_FULFILLED)) {
                 breakThis = false;
             }
+
             double nextActArrTime = prevActStartTime + transportCosts.getTransportTime(prevAct.getLocation(), nextAct.getLocation(), prevActStartTime, newDriver, newVehicle);
             prevActStartTime = Math.max(nextActArrTime, nextAct.getTheoreticalEarliestOperationStartTime()) + activityCosts.getActivityDuration(prevAct, nextAct,nextActArrTime,newDriver,newVehicle);
             prevAct = nextAct;
@@ -138,6 +143,7 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
             return InsertionData.createEmptyInsertionData();
         }
         InsertionData insertionData = new InsertionData(bestCost, InsertionData.NO_INDEX, insertionIndex, newVehicle, newDriver);
+        breakAct2Insert.setLocation(bestLocation);
         insertionData.getEvents().add(new InsertBreak(currentRoute, newVehicle, breakAct2Insert, insertionIndex));
         insertionData.getEvents().add(new SwitchVehicle(currentRoute, newVehicle, newVehicleDepartureTime));
         insertionData.setVehicleDepartureTime(newVehicleDepartureTime);
