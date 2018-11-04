@@ -70,8 +70,6 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
     @Override
     public InsertionData getInsertionData(final VehicleRoute currentRoute, final Job jobToInsert, final Vehicle newVehicle, double newVehicleDepartureTime, final Driver newDriver, final double bestKnownCosts) {
         BreakForMultipleTimeWindows breakToInsert = (BreakForMultipleTimeWindows) jobToInsert;
-        if (currentRoute.isEmpty()) return InsertionData.createEmptyInsertionData();
-
         JobInsertionContext insertionContext = new JobInsertionContext(currentRoute, jobToInsert, newVehicle, newDriver, newVehicleDepartureTime);
         int insertionIndex = InsertionData.NO_INDEX;
 
