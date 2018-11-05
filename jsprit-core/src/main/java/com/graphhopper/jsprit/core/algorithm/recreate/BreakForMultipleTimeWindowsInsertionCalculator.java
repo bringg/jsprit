@@ -23,13 +23,7 @@ import java.util.Iterator;
 final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInsertionCostsCalculator {
     private static final Logger logger = LoggerFactory.getLogger(BreakInsertionCalculator.class);
 
-    private HardRouteConstraint hardRouteLevelConstraint;
-
-    private HardActivityConstraint hardActivityLevelConstraint;
-
-    private SoftRouteConstraint softRouteConstraint;
-
-    private SoftActivityConstraint softActivityConstraint;
+    private ConstraintManager constraintManager;
 
     private VehicleRoutingTransportCosts transportCosts;
 
@@ -42,13 +36,9 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
     private AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
 
     public BreakForMultipleTimeWindowsInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager) {
-        super();
         this.transportCosts = routingCosts;
         this.activityCosts = activityCosts;
-        hardRouteLevelConstraint = constraintManager;
-        hardActivityLevelConstraint = constraintManager;
-        softActivityConstraint = constraintManager;
-        softRouteConstraint = constraintManager;
+        this.constraintManager = constraintManager;
         this.additionalTransportCostsCalculator = additionalTransportCostsCalculator;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
         logger.debug("initialise " + this);
@@ -79,14 +69,14 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
         /*
         check hard constraints at route level
          */
-        if (!hardRouteLevelConstraint.fulfilled(insertionContext)) {
+        if (!constraintManager.fulfilled(insertionContext)) {
             return InsertionData.createEmptyInsertionData();
         }
 
         /*
         check soft constraints at route level
          */
-        double additionalICostsAtRouteLevel = softRouteConstraint.getCosts(insertionContext);
+        double additionalICostsAtRouteLevel = constraintManager.getCosts(insertionContext);
 
         double bestCost = bestKnownCosts;
         additionalICostsAtRouteLevel += additionalAccessEgressCalculator.getCosts(insertionContext);
@@ -116,10 +106,10 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
             breakAct2Insert.setLocation(prevAct.getLocation());
             breakAct2Insert.setTheoreticalEarliestOperationStartTime(breakToInsert.getTimeWindow().getStart());
             breakAct2Insert.setTheoreticalLatestOperationStartTime(breakToInsert.getTimeWindow().getEnd());
-            HardActivityConstraint.ConstraintsStatus status = hardActivityLevelConstraint.fulfilled(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
+            HardActivityConstraint.ConstraintsStatus status = constraintManager.fulfilled(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
             if (status.equals(HardActivityConstraint.ConstraintsStatus.FULFILLED)) {
                 //from job2insert induced costs at activity level
-                double additionalICostsAtActLevel = softActivityConstraint.getCosts(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
+                double additionalICostsAtActLevel = constraintManager.getCosts(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
                 double additionalTransportationCosts = additionalTransportCostsCalculator.getCosts(insertionContext, prevAct, nextAct, breakAct2Insert, prevActStartTime);
                 if (additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts < bestCost) {
                     bestCost = additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts;
