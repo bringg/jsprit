@@ -103,7 +103,8 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
                 tourEnd = true;
             }
             boolean breakThis = true;
-            breakAct2Insert.setLocation(prevAct.getLocation());
+            final Location location = Location.Builder.newInstance().setId(breakAct2Insert.getJob().getLocation().getId()).setCoordinate(prevAct.getLocation().getCoordinate()).build();
+            breakAct2Insert.setLocation(location);
             breakAct2Insert.setTheoreticalEarliestOperationStartTime(breakToInsert.getTimeWindow().getStart());
             breakAct2Insert.setTheoreticalLatestOperationStartTime(breakToInsert.getTimeWindow().getEnd());
             HardActivityConstraint.ConstraintsStatus status = constraintManager.fulfilled(insertionContext, prevAct, breakAct2Insert, nextAct, prevActStartTime);
@@ -114,7 +115,7 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
                 if (additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts < bestCost) {
                     bestCost = additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts;
                     insertionIndex = actIndex;
-                    bestLocation = prevAct.getLocation();
+                    bestLocation = location;
                 }
                 breakThis = false;
             } else if (status.equals(HardActivityConstraint.ConstraintsStatus.NOT_FULFILLED)) {
