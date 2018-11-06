@@ -36,6 +36,7 @@ public class BreakForMultipleTimeWindows extends Service {
             }
             this.setType("break");
             super.capacity = Capacity.Builder.newInstance().build();
+            super.skills = skillBuilder.build();
             return new BreakForMultipleTimeWindows(this);
         }
 
