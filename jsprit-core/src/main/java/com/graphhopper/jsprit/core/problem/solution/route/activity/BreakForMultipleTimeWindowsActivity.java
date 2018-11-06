@@ -63,6 +63,7 @@ public class BreakForMultipleTimeWindowsActivity extends AbstractActivity implem
         counter++;
         this.aBreak = aBreak;
         this.duration = aBreak.getServiceDuration();
+        this.location = aBreak.getLocation();
     }
 
     protected BreakForMultipleTimeWindowsActivity(BreakForMultipleTimeWindowsActivity breakActivity) {

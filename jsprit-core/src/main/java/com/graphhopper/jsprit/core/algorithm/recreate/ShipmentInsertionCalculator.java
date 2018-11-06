@@ -183,12 +183,6 @@ final class ShipmentInsertionCalculator extends AbstractInsertionCalculator {
                     TourActivity nextAct_deliveryLoop;
                     if (j < activities.size()) {
                         nextAct_deliveryLoop = activities.get(j);
-                        if (i == j && nextAct_deliveryLoop instanceof BreakForMultipleTimeWindowsActivity) {
-                            final BreakForMultipleTimeWindowsActivity breakForMultipleTimeWindowsActivity = (BreakForMultipleTimeWindowsActivity) nextAct_deliveryLoop.duplicate();
-                            final Location location = Location.Builder.newInstance().setId(breakForMultipleTimeWindowsActivity.getJob().getLocation().getId()).setCoordinate(prevAct_deliveryLoop.getLocation().getCoordinate()).build();
-                            breakForMultipleTimeWindowsActivity.setLocation(location);
-                            nextAct_deliveryLoop = breakForMultipleTimeWindowsActivity;
-                        }
                     } else {
                         nextAct_deliveryLoop = end;
                         tourEnd_deliveryLoop = true;
@@ -223,6 +217,14 @@ final class ShipmentInsertionCalculator extends AbstractInsertionCalculator {
                     //update prevAct and endTime
                     double nextActArrTime = prevActEndTime_deliveryLoop + transportCosts.getTransportTime(prevAct_deliveryLoop.getLocation(), nextAct_deliveryLoop.getLocation(), prevActEndTime_deliveryLoop, newDriver, newVehicle);
                     prevActEndTime_deliveryLoop = Math.max(nextActArrTime, nextAct_deliveryLoop.getTheoreticalEarliestOperationStartTime()) + activityCosts.getActivityDuration(prevAct_deliveryLoop, nextAct_deliveryLoop,nextActArrTime,newDriver,newVehicle);
+                    if (i == j && nextAct_deliveryLoop instanceof BreakForMultipleTimeWindowsActivity) {
+                        final BreakForMultipleTimeWindowsActivity breakForMultipleTimeWindowsActivity = (BreakForMultipleTimeWindowsActivity) nextAct_deliveryLoop.duplicate();
+                        final Location location = Location.Builder.newInstance()
+                            .setId(breakForMultipleTimeWindowsActivity.getJob().getLocation().getId())
+                            .setCoordinate(prevAct_deliveryLoop.getLocation().getCoordinate()).build();
+                        breakForMultipleTimeWindowsActivity.setLocation(location);
+                        nextAct_deliveryLoop = breakForMultipleTimeWindowsActivity;
+                    }
                     prevAct_deliveryLoop = nextAct_deliveryLoop;
                     j++;
                 }
