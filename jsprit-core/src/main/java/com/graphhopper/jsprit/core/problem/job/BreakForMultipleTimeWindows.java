@@ -1,7 +1,6 @@
 package com.graphhopper.jsprit.core.problem.job;
 
 import com.graphhopper.jsprit.core.problem.Capacity;
-import com.graphhopper.jsprit.core.problem.Skills;
 
 public class BreakForMultipleTimeWindows extends Service {
 
@@ -37,7 +36,6 @@ public class BreakForMultipleTimeWindows extends Service {
             }
             this.setType("break");
             super.capacity = Capacity.Builder.newInstance().build();
-            super.skills = Skills.Builder.newInstance().build();
             return new BreakForMultipleTimeWindows(this);
         }
 
