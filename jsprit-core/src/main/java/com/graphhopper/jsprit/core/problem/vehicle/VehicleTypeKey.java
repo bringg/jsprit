@@ -99,6 +99,8 @@ public class VehicleTypeKey extends AbstractVehicle.AbstractTypeKey {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(type).append("_").append(startLocationId).append("_").append(endLocationId)
             .append("_").append(Double.toString(earliestStart)).append("_").append(Double.toString(latestEnd));
+        if (userData != null)
+            stringBuilder.append("_").append(userData.toString());
         return stringBuilder.toString();
     }
 
