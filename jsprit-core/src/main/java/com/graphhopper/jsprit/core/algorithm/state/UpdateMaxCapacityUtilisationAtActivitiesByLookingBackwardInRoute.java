@@ -28,7 +28,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
  *
  * @author schroeder
  */
-public class UpdateMaxCapacityUtilisationAtActivitiesByLookingBackwardInRoute implements ActivityVisitor, StateUpdater {
+class UpdateMaxCapacityUtilisationAtActivitiesByLookingBackwardInRoute implements ActivityVisitor, StateUpdater {
 
     private StateManager stateManager;
 

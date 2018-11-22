@@ -32,7 +32,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
  *
  * @author stefan
  */
-public class UpdateMaxCapacityUtilisationAtRoute implements ActivityVisitor, StateUpdater {
+class UpdateMaxCapacityUtilisationAtRoute implements ActivityVisitor, StateUpdater {
 
     private StateManager stateManager;
 
