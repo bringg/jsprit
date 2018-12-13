@@ -91,6 +91,8 @@ public class Shipment extends AbstractJob {
 
         private String driverId = null;
 
+        private boolean mustAssign = false;
+
         /**
          * Returns new instance of this builder.
          *
@@ -246,6 +248,11 @@ public class Shipment extends AbstractJob {
             return this;
         }
 
+        public Builder setMustAssign(boolean mustAssign){
+            this.mustAssign = mustAssign;
+            return this;
+        }
+
         /**
          * Builds the shipment.
          *
@@ -376,6 +383,8 @@ public class Shipment extends AbstractJob {
 
     private final String driverId;
 
+    private final boolean mustAssign;
+
     Shipment(Builder builder) {
         setUserData(builder.userData);
         this.id = builder.id;
@@ -391,6 +400,7 @@ public class Shipment extends AbstractJob {
         this.priority = builder.priority;
         this.maxTimeInVehicle = builder.maxTimeInVehicle;
         this.driverId = builder.driverId;
+        this.mustAssign = builder.mustAssign;
     }
 
     @Override
@@ -533,4 +543,6 @@ public class Shipment extends AbstractJob {
     public String getDriverId() {
         return driverId;
     }
+
+    public boolean getMustAssign() { return mustAssign; }
 }

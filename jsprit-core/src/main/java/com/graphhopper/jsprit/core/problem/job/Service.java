@@ -95,6 +95,8 @@ public class Service extends AbstractJob {
 
 		protected String driverId = null;
 
+		protected boolean mustAssign = false;
+
 		Builder(String id){
 			this.id = id;
 			timeWindows = new TimeWindowsImpl();
@@ -267,6 +269,11 @@ public class Service extends AbstractJob {
             this.driverId = driverId;
             return this;
         }
+
+        public  Builder<T> setMustAssign(boolean mustAssign) {
+            this.mustAssign= mustAssign;
+            return this;
+        }
     }
 
     private final String id;
@@ -291,6 +298,8 @@ public class Service extends AbstractJob {
 
     private final String driverId;
 
+    private final boolean mustAssign;
+
     Service(Builder<?> builder) {
         setUserData(builder.userData);
         id = builder.id;
@@ -304,6 +313,7 @@ public class Service extends AbstractJob {
         priority = builder.priority;
 	    maxTimeInVehicle = builder.maxTimeInVehicle;
 	    driverId = builder.driverId;
+	    mustAssign = builder.mustAssign;
 	}
 
     public Collection<TimeWindow> getTimeWindows(){
@@ -427,4 +437,6 @@ public class Service extends AbstractJob {
     public String getDriverId() {
         return driverId;
     }
+
+    public boolean getMustAssign() { return mustAssign;}
 }
