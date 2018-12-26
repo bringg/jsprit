@@ -40,7 +40,7 @@ public class PickupShipment extends AbstractActivity implements PickupActivity{
         this.shipment = shipment;
     }
 
-    private PickupShipment(PickupShipment pickupShipmentActivity) {
+    protected PickupShipment(PickupShipment pickupShipmentActivity) {
         this.shipment = (Shipment) pickupShipmentActivity.getJob();
         this.arrTime = pickupShipmentActivity.getArrTime();
         this.endTime = pickupShipmentActivity.getEndTime();
