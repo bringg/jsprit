@@ -23,7 +23,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 
-public final class PickupShipment extends AbstractActivity implements PickupActivity{
+public class PickupShipment extends AbstractActivity implements PickupActivity{
 
     private Shipment shipment;
 
@@ -87,10 +87,6 @@ public final class PickupShipment extends AbstractActivity implements PickupActi
     @Override
     public double getOperationTime() {
         return shipment.getPickupServiceTime();
-    }
-
-    public double getLoadingTime() {
-        return shipment.getPickupLoadingTime();
     }
 
     @Override
