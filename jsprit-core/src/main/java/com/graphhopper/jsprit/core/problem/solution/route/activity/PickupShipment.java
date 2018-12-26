@@ -89,6 +89,10 @@ public final class PickupShipment extends AbstractActivity implements PickupActi
         return shipment.getPickupServiceTime();
     }
 
+    public double getLoadingTime() {
+        return shipment.getPickupLoadingTime();
+    }
+
     @Override
     public double getArrTime() {
         return arrTime;
