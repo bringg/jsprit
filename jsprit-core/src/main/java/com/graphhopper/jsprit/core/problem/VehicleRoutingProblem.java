@@ -534,7 +534,7 @@ public class VehicleRoutingProblem {
      * @author sschroeder
      */
     public static enum FleetSize {
-        FINITE, INFINITE
+        FINITE, INFINITE, INFINITE_WITH_BREAKS
     }
 
     /**
@@ -724,6 +724,17 @@ public class VehicleRoutingProblem {
             for (AbstractActivity act : activityMap.get(job)) acts.add((AbstractActivity) act.duplicate());
         }
         return acts;
+    }
+
+    public void addBreak(Break aBreak) {
+        List<AbstractActivity> breakActivities = jobActivityFactory.createActivities(aBreak);
+        if (breakActivities.isEmpty())
+            throw new IllegalArgumentException("At least one activity for break needs to be created by activityFactory!");
+        for(AbstractActivity act : breakActivities){
+            act.setIndex(nuActivities);
+            ++nuActivities;
+        }
+        activityMap.put(aBreak, breakActivities);
     }
 
 }
