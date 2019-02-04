@@ -727,7 +727,7 @@ public class VehicleRoutingProblem {
     }
 
     public void addBreak(Break aBreak) {
-        List<AbstractActivity> breakActivities = jobActivityFactory.createActivities(v.getBreak());
+        List<AbstractActivity> breakActivities = jobActivityFactory.createActivities(aBreak);
         if (breakActivities.isEmpty())
             throw new IllegalArgumentException("At least one activity for break needs to be created by activityFactory.");
         for(AbstractActivity act : breakActivities){
