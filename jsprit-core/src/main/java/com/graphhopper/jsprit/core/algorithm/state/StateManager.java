@@ -139,8 +139,8 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
         this.vrp = vehicleRoutingProblem;
         this.nuActivities = nuActivities;
         nuVehicleTypeKeys = Math.max(3, getNuVehicleTypes(vrp) + 2);
-        activityStates = new Object[nuActivities][initialStateArrayLength];
-        vehicleDependentActivityStates = new Object[nuActivities][nuVehicleTypeKeys][initialStateArrayLength];
+        activityStates = new Object[this.nuActivities][initialStateArrayLength];
+        vehicleDependentActivityStates = new Object[this.nuActivities][nuVehicleTypeKeys][initialStateArrayLength];
 //        if(vehicleRoutingProblem.getFleetSize().equals(VehicleRoutingProblem.FleetSize.FINITE)){
 //            isIndexedBased = true;
 //            routeStatesArr = new Object[vrp.getVehicles().size() + 2][initialStateArrayLength];
