@@ -44,16 +44,8 @@ public class RandomInsertionTest {
 
         final RandomInsertion randomInsertion = new RandomInsertion(null, builder.build());
         final Map<String, Integer> jobCanBeServedByDriversCount = randomInsertion.jobCanBeServedByDriversCount;
-
-        int numBreaks = 0;
-        for (Map.Entry<String, Integer> entry : jobCanBeServedByDriversCount.entrySet()) {
-            if (entry.getKey().contains("break_")) {
-                ++numBreaks;
-                assertEquals((int) entry.getValue(), 1);
-            }
-        }
-
-        assertEquals(2, numBreaks);
+        assertEquals(1, jobCanBeServedByDriversCount.get("break_v1"), .001);
+        assertEquals(1, jobCanBeServedByDriversCount.get("break_v2"), .001);
     }
 
     @Test
