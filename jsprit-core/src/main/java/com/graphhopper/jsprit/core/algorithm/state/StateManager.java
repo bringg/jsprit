@@ -68,7 +68,7 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
 
     private Map<String, StateId> createdStateIds = new HashMap<String, StateId>();
 
-    private int nuActivities;
+    protected int nuActivities;
 
     private int nuVehicleTypeKeys;
 
@@ -155,7 +155,7 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
     }
 
 
-    private int getNuVehicleTypes(VehicleRoutingProblem vrp) {
+    protected int getNuVehicleTypes(VehicleRoutingProblem vrp) {
         int maxIndex = 0;
         for (Vehicle v : vrp.getVehicles()) {
             maxIndex = Math.max(maxIndex, v.getVehicleTypeIdentifier().getIndex());

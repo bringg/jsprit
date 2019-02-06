@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -355,5 +356,13 @@ public class StateManagerTest {
             myState = stateManager.createStateId("myState"+i);
         }
         stateManager.putTypedInternalRouteState(route,myState,1.);
+    }
+
+
+    @Test
+    public void shouldSetPassedNuActivities() {
+        final int nuActivities = new Random().nextInt();
+        final StateManager stateManager = new StateManager(vrpMock, nuActivities);
+        assertEquals(nuActivities, stateManager.nuActivities);
     }
 }
