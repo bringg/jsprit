@@ -361,7 +361,7 @@ public class StateManagerTest {
 
     @Test
     public void shouldSetPassedNuActivities() {
-        final int nuActivities = new Random().nextInt();
+        final int nuActivities = new Random().nextInt(1000);
         final StateManager stateManager = new StateManager(vrpMock, nuActivities);
         assertEquals(nuActivities, stateManager.nuActivities);
     }
