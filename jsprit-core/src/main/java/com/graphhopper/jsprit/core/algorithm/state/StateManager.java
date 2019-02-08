@@ -137,7 +137,7 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
         stateIndexCounter = initialNoStates;
         int initialStateArrayLength = 30;
         this.vrp = vehicleRoutingProblem;
-        this.nuActivities = nuActivities;
+        this.nuActivities = Math.max(10, nuActivities);
         nuVehicleTypeKeys = Math.max(3, getNuVehicleTypes(vrp) + 2);
         activityStates = new Object[this.nuActivities][initialStateArrayLength];
         vehicleDependentActivityStates = new Object[this.nuActivities][nuVehicleTypeKeys][initialStateArrayLength];
@@ -155,7 +155,7 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
     }
 
 
-    protected int getNuVehicleTypes(VehicleRoutingProblem vrp) {
+    private int getNuVehicleTypes(VehicleRoutingProblem vrp) {
         int maxIndex = 0;
         for (Vehicle v : vrp.getVehicles()) {
             maxIndex = Math.max(maxIndex, v.getVehicleTypeIdentifier().getIndex());
