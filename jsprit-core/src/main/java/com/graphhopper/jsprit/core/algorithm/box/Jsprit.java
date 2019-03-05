@@ -178,9 +178,9 @@ public class Jsprit {
         private VehicleFleetManager fleetManager = null;
 
         private RuinRadial radial = null;
-        private RuinRandom random_for_regret = null;
-        private RuinRandom random_for_best = null;
-        private RuinRandom random_for_random = null;
+        private RuinRandom randomForRegret = null;
+        private RuinRandom randomForBest = null;
+        private RuinRandom randomForRandom = null;
         private RuinWorst worst = null;
         private RuinClusters clusters = null;
         private RuinString stringRuin = null;
@@ -325,18 +325,18 @@ public class Jsprit {
             return this;
         }
 
-        public Builder setRandom_for_regret(RuinRandom random_for_regret) {
-            this.random_for_regret = random_for_regret;
+        public Builder setRandomForRegret(RuinRandom randomForRegret) {
+            this.randomForRegret = randomForRegret;
             return this;
         }
 
-        public Builder setRandom_for_best(RuinRandom random_for_best) {
-            this.random_for_best = random_for_best;
+        public Builder setRandomForBest(RuinRandom randomForBest) {
+            this.randomForBest = randomForBest;
             return this;
         }
 
-        public Builder setRandom_for_random(RuinRandom random_for_random) {
-            this.random_for_random = random_for_random;
+        public Builder setRandomForRandom(RuinRandom randomForRandom) {
+            this.randomForRandom = randomForRandom;
             return this;
         }
 
@@ -445,9 +445,9 @@ public class Jsprit {
         customStrategies.putAll(builder.customStrategies);
         vehicleFleetManager = builder.fleetManager;
         radial = builder.radial;
-        random_for_regret = builder.random_for_regret;
-        random_for_best = builder.random_for_best;
-        random_for_random = builder.random_for_random;
+        random_for_regret = builder.randomForRegret;
+        random_for_best = builder.randomForBest;
+        random_for_random = builder.randomForRandom;
         worst = builder.worst;
         clusters = builder.clusters;
         stringRuin = builder.stringRuin;
