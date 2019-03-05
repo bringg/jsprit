@@ -105,11 +105,7 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
 
     public void visit(TourActivity activity, TourActivity prev) {
         for (Vehicle vehicle : vehicles) {
-            double latestArrTimeAtPrevAct = latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
-            Location prevLocation = location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
-            double potentialLatestArrivalTimeAtCurrAct = latestArrTimeAtPrevAct - transportCosts.getBackwardTransportTime(activity.getLocation(), prevLocation,
-                latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(prev, activity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
-            double latestArrivalTime = Math.min(activity.getTheoreticalLatestOperationStartTime(), potentialLatestArrivalTimeAtCurrAct);
+            double latestArrivalTime = getLatestArrivalTime(vehicle, activity, prev);
             if (latestArrivalTime < activity.getTheoreticalEarliestOperationStartTime()) {
                 stateManager.putTypedInternalRouteState(route, vehicle, InternalStates.SWITCH_NOT_FEASIBLE, true);
             }
@@ -119,6 +115,13 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
         }
     }
 
+    protected double getLatestArrivalTime(Vehicle vehicle, TourActivity activity, TourActivity prev) {
+        double latestArrTimeAtPrevAct = latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
+        Location prevLocation = location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
+        double potentialLatestArrivalTimeAtCurrAct = latestArrTimeAtPrevAct - transportCosts.getBackwardTransportTime(activity.getLocation(), prevLocation,
+            latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(prev, activity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
+        return Math.min(activity.getTheoreticalLatestOperationStartTime(), potentialLatestArrivalTimeAtCurrAct);
+    }
 
     public void finish() {
     }
