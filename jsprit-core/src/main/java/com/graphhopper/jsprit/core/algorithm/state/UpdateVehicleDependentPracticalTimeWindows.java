@@ -61,17 +61,17 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
 
     };
 
-    private final StateManager stateManager;
+    protected final StateManager stateManager;
 
-    private final VehicleRoutingTransportCosts transportCosts;
+    protected final VehicleRoutingTransportCosts transportCosts;
 
-    private final VehicleRoutingActivityCosts activityCosts;
+    protected final VehicleRoutingActivityCosts activityCosts;
 
-    private VehicleRoute route;
+    protected VehicleRoute route;
 
-    private double[] latest_arrTimes_at_prevAct;
+    protected double[] latest_arrTimes_at_prevAct;
 
-    private Location[] location_of_prevAct;
+    protected Location[] location_of_prevAct;
 
     private Collection<Vehicle> vehicles;
 
