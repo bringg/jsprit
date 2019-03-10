@@ -61,17 +61,17 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
 
     };
 
-    protected final StateManager stateManager;
+    private final StateManager stateManager;
 
-    protected final VehicleRoutingTransportCosts transportCosts;
+    private final VehicleRoutingTransportCosts transportCosts;
 
-    protected final VehicleRoutingActivityCosts activityCosts;
+    private final VehicleRoutingActivityCosts activityCosts;
 
-    protected VehicleRoute route;
+    private VehicleRoute route;
 
-    protected double[] latest_arrTimes_at_prevAct;
+    private double[] latest_arrTimes_at_prevAct;
 
-    protected Location[] location_of_prevAct;
+    private Location[] location_of_prevAct;
 
     private Collection<Vehicle> vehicles;
 
@@ -105,7 +105,11 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
 
     public void visit(TourActivity activity, TourActivity prev) {
         for (Vehicle vehicle : vehicles) {
-            double latestArrivalTime = getLatestArrivalTime(vehicle, activity, prev);
+            double latestArrTimeAtPrevAct = latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
+            Location prevLocation = location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
+            double potentialLatestArrivalTimeAtCurrAct = latestArrTimeAtPrevAct - transportCosts.getBackwardTransportTime(activity.getLocation(), prevLocation,
+                latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(prev, activity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
+            double latestArrivalTime = Math.min(activity.getTheoreticalLatestOperationStartTime(), potentialLatestArrivalTimeAtCurrAct);
             if (latestArrivalTime < activity.getTheoreticalEarliestOperationStartTime()) {
                 stateManager.putTypedInternalRouteState(route, vehicle, InternalStates.SWITCH_NOT_FEASIBLE, true);
             }
@@ -115,13 +119,6 @@ public class UpdateVehicleDependentPracticalTimeWindows implements RouteVisitor,
         }
     }
 
-    protected double getLatestArrivalTime(Vehicle vehicle, TourActivity activity, TourActivity prev) {
-        double latestArrTimeAtPrevAct = latest_arrTimes_at_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
-        Location prevLocation = location_of_prevAct[vehicle.getVehicleTypeIdentifier().getIndex()];
-        double potentialLatestArrivalTimeAtCurrAct = latestArrTimeAtPrevAct - transportCosts.getBackwardTransportTime(activity.getLocation(), prevLocation,
-            latestArrTimeAtPrevAct, route.getDriver(), vehicle) - activityCosts.getActivityDuration(prev, activity, latestArrTimeAtPrevAct, route.getDriver(), route.getVehicle());
-        return Math.min(activity.getTheoreticalLatestOperationStartTime(), potentialLatestArrivalTimeAtCurrAct);
-    }
 
     public void finish() {
     }
