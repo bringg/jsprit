@@ -126,7 +126,6 @@ public class HVRPExample {
         SolutionPrinter.print(vrp, best, SolutionPrinter.Print.VERBOSE);
 
         new GraphStreamViewer(vrp, best).setRenderDelay(100).display();
-
     }
 
 }
