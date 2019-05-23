@@ -111,7 +111,7 @@ public class IterationWithoutImprovementTermination implements PrematureAlgorith
         if (unassignedJobsEqual && progressTooSlow){
             log.debug("Termination condition by percentage reached after " + Integer.toString(i) + " Iterations.");
             return true;
-        }else
-            return false;
+        }
+        return false;
     }
 }
