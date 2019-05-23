@@ -151,7 +151,7 @@ public class IterationsWithoutImprovementTest {
     }
 
     @Test
-    public void isPrematureBreakLastCostIsWorstBreak() {
+    public void isPrematureBreakLastCostIsWorstShouldNotBreak() {
         int maxIterations = 7;
         IterationWithoutImprovementTermination termination = new IterationWithoutImprovementTermination(5, 1.0);
         SearchStrategy.DiscoveredSolution discoveredSolution = mock(SearchStrategy.DiscoveredSolution.class);
