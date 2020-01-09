@@ -94,6 +94,12 @@ public class JobInsertionCostsCalculatorBuilder {
 
     private boolean addDefaultCostCalc = true;
 
+    private JobInsertionCostsCalculatorFactory shipmentCalculatorFactory = new ShipmentInsertionCalculatorFactory();
+
+    private JobInsertionCostsCalculatorFactory serviceCalculatorFactory = new ServiceInsertionCalculatorFactory();
+
+    private JobInsertionCostsCalculatorFactory breakCalculatorFactory = new BreakInsertionCalculatorFactory();
+
     /**
      * Constructs the builder.
      * <p>
@@ -107,6 +113,24 @@ public class JobInsertionCostsCalculatorBuilder {
         super();
         this.insertionListeners = insertionListeners;
         this.algorithmListeners = algorithmListeners;
+    }
+
+    public JobInsertionCostsCalculatorBuilder setShipmentCalculatorFactory(JobInsertionCostsCalculatorFactory shipmentCalculatorFactory) {
+        if (shipmentCalculatorFactory == null) return this;
+        this.shipmentCalculatorFactory = shipmentCalculatorFactory;
+        return this;
+    }
+
+    public JobInsertionCostsCalculatorBuilder setServiceCalculatorFactory(JobInsertionCostsCalculatorFactory serviceCalculatorFactory) {
+        if (serviceCalculatorFactory == null) return this;
+        this.serviceCalculatorFactory = serviceCalculatorFactory;
+        return this;
+    }
+
+    public JobInsertionCostsCalculatorBuilder setBreakCalculatorFactory(JobInsertionCostsCalculatorFactory breakCalculatorFactory) {
+        if (breakCalculatorFactory == null) return this;
+        this.breakCalculatorFactory = breakCalculatorFactory;
+        return this;
     }
 
     /**
@@ -286,13 +310,10 @@ public class JobInsertionCostsCalculatorBuilder {
             }
 
         };
-        ShipmentInsertionCalculator shipmentInsertion = new ShipmentInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(),actInsertionCalc, constraintManager);
-        shipmentInsertion.setJobActivityFactory(activityFactory);
-        ServiceInsertionCalculator serviceInsertion = new ServiceInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), actInsertionCalc, constraintManager);
-        serviceInsertion.setJobActivityFactory(activityFactory);
 
-        BreakInsertionCalculator breakInsertionCalculator = new BreakInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), actInsertionCalc, constraintManager);
-        breakInsertionCalculator.setJobActivityFactory(activityFactory);
+        JobInsertionCostsCalculator shipmentInsertion = shipmentCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
+        JobInsertionCostsCalculator serviceInsertion = serviceCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
+        JobInsertionCostsCalculator breakInsertion = breakCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
 
         BreakForMultipleTimeWindowsInsertionCalculator breakForMultipleTimeWindowsInsertionCalculator = new BreakForMultipleTimeWindowsInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), actInsertionCalc, constraintManager);
         breakForMultipleTimeWindowsInsertionCalculator.setJobActivityFactory(activityFactory);
@@ -302,7 +323,7 @@ public class JobInsertionCostsCalculatorBuilder {
         switcher.put(Service.class, serviceInsertion);
         switcher.put(Pickup.class, serviceInsertion);
         switcher.put(Delivery.class, serviceInsertion);
-        switcher.put(Break.class, breakInsertionCalculator);
+        switcher.put(Break.class, breakInsertion);
         switcher.put(BreakForMultipleTimeWindows.class, breakForMultipleTimeWindowsInsertionCalculator);
         switcher.put(ShipmentWithMutablePickupDeliverOptions.class, shipmentInsertion);
 

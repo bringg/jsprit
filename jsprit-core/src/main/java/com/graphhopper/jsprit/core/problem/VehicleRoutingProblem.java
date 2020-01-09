@@ -77,31 +77,29 @@ public class VehicleRoutingProblem {
 
         private VehicleRoutingActivityCosts activityCosts = new WaitingTimeCosts();
 
-        private Map<String, Job> jobs = new LinkedHashMap<String, Job>();
+        private Map<String, Job> jobs = new LinkedHashMap<>();
 
-        private Map<String, Job> tentativeJobs = new LinkedHashMap<String, Job>();
+        private Map<String, Job> tentativeJobs = new LinkedHashMap<>();
 
-        private Set<String> jobsInInitialRoutes = new HashSet<String>();
+        private Map<String, Job> jobsInInitialRoutes = new LinkedHashMap<>();
 
-        private Map<String, Coordinate> tentative_coordinates = new HashMap<String, Coordinate>();
+        private Map<String, Coordinate> tentative_coordinates = new HashMap<>();
 
         private FleetSize fleetSize = FleetSize.INFINITE;
 
         private Map<String, VehicleType> vehicleTypes = new HashMap<>();
 
-        private Collection<VehicleRoute> initialRoutes = new ArrayList<VehicleRoute>();
+        private Collection<VehicleRoute> initialRoutes = new ArrayList<>();
 
-        private Set<Vehicle> uniqueVehicles = new LinkedHashSet<Vehicle>();
+        private Set<Vehicle> uniqueVehicles = new LinkedHashSet<>();
 
-        private Set<String> addedVehicleIds = new LinkedHashSet<String>();
-
-        private boolean hasBreaks = false;
+        private Set<String> addedVehicleIds = new LinkedHashSet<>();
 
         private JobActivityFactory jobActivityFactory = new JobActivityFactory() {
 
             @Override
             public List<AbstractActivity> createActivities(Job job) {
-                List<AbstractActivity> acts = new ArrayList<AbstractActivity>();
+                List<AbstractActivity> acts = new ArrayList<>();
                 if( job instanceof Break){
                     acts.add(BreakActivity.newInstance((Break) job));
                 }
@@ -116,25 +114,19 @@ public class VehicleRoutingProblem {
 
         };
 
-        private int jobIndexCounter = 1;
-
         private int vehicleIndexCounter = 1;
 
         private int activityIndexCounter = 1;
 
         private int vehicleTypeIdIndexCounter = 1;
 
-        private Map<VehicleTypeKey, Integer> typeKeyIndices = new HashMap<VehicleTypeKey, Integer>();
+        private Map<VehicleTypeKey, Integer> typeKeyIndices = new HashMap<>();
 
-        private Map<Job, List<AbstractActivity>> activityMap = new HashMap<Job, List<AbstractActivity>>();
+        private Map<Job, List<AbstractActivity>> activityMap = new HashMap<>();
 
         private final DefaultShipmentActivityFactory shipmentActivityFactory = new DefaultShipmentActivityFactory();
 
         private final DefaultTourActivityFactory serviceActivityFactory = new DefaultTourActivityFactory();
-
-        private void incJobIndexCounter() {
-            jobIndexCounter++;
-        }
 
         private void incActivityIndexCounter() {
             activityIndexCounter++;
@@ -144,7 +136,7 @@ public class VehicleRoutingProblem {
             vehicleTypeIdIndexCounter++;
         }
 
-        private Set<Location> allLocations = new HashSet<Location>();
+        private Set<Location> allLocations = new HashSet<>();
 
         /**
          * Returns the unmodifiable map of collected locations (mapped by their location-id).
@@ -235,8 +227,6 @@ public class VehicleRoutingProblem {
                 throw new IllegalArgumentException("The vehicle routing problem already contains a service or shipment with id " + job.getId() + ". Please make sure you use unique ids for all services and shipments.");
             if (!(job instanceof Service || job instanceof Shipment))
                 throw new IllegalArgumentException("Job must be either a service or a shipment.");
-            job.setIndex(jobIndexCounter);
-            incJobIndexCounter();
             tentativeJobs.put(job.getId(), job);
             addLocationToTentativeLocations(job);
             return this;
@@ -317,12 +307,9 @@ public class VehicleRoutingProblem {
                 incActivityIndexCounter();
                 if (act instanceof TourActivity.JobActivity) {
                     Job job = ((TourActivity.JobActivity) act).getJob();
-                    jobsInInitialRoutes.add(job.getId());
-                    registerJobAndActivity(abstractAct, job);
-
-                    if (act instanceof BreakActivity)
-                        continue;
+                    jobsInInitialRoutes.put(job.getId(), job);
                     addLocationToTentativeLocations(job);
+                    registerJobAndActivity(abstractAct, job);
                 }
             }
             initialRoutes.add(route);
@@ -334,7 +321,7 @@ public class VehicleRoutingProblem {
         private void registerJobAndActivity(AbstractActivity abstractAct, Job job) {
             if (activityMap.containsKey(job)) activityMap.get(job).add(abstractAct);
             else {
-                List<AbstractActivity> actList = new ArrayList<AbstractActivity>();
+                List<AbstractActivity> actList = new ArrayList<>();
                 actList.add(abstractAct);
                 activityMap.put(job, actList);
             }
@@ -446,16 +433,26 @@ public class VehicleRoutingProblem {
                 transportCosts = new CrowFlyCosts(getLocations());
             }
             for (Job job : tentativeJobs.values()) {
-                if (!jobsInInitialRoutes.contains(job.getId())) {
+                if (!jobsInInitialRoutes.containsKey(job.getId())) {
                     addJobToFinalJobMapAndCreateActivities(job);
                 }
             }
+
+            int jobIndexCounter = 1;
+            for (Job job : jobs.values()) {
+                ((AbstractJob)job).setIndex(jobIndexCounter++);
+            }
+            for (Job job : jobsInInitialRoutes.values()) {
+                ((AbstractJob)job).setIndex(jobIndexCounter++);
+            }
+
             boolean hasBreaks = addBreaksToActivityMap();
             if (hasBreaks && fleetSize.equals(FleetSize.INFINITE))
                 throw new UnsupportedOperationException("Breaks are not yet supported when dealing with infinite fleet. Either set it to finite or omit breaks.");
             return new VehicleRoutingProblem(this);
         }
 
+        @Deprecated
         public Builder addLocation(String locationId, Coordinate coordinate) {
             tentative_coordinates.put(locationId, coordinate);
             return this;
@@ -533,8 +530,8 @@ public class VehicleRoutingProblem {
      *
      * @author sschroeder
      */
-    public static enum FleetSize {
-        FINITE, INFINITE, INFINITE_WITH_BREAKS
+    public enum FleetSize {
+        FINITE, INFINITE
     }
 
     /**
@@ -582,10 +579,6 @@ public class VehicleRoutingProblem {
 
     private int nuActivities;
 
-    private int vehicleIndexCounter;
-
-    private final JobActivityFactory originalJobActivityFactory;
-
     private final JobActivityFactory jobActivityFactory = new JobActivityFactory() {
 
         @Override
@@ -599,19 +592,15 @@ public class VehicleRoutingProblem {
         this.jobs = builder.jobs;
         this.fleetSize = builder.fleetSize;
         this.vehicles = builder.uniqueVehicles;
-
-        //this allow us to serialize the vrp object, as builder.vehicleTypes.values() return transient collection
-        this.vehicleTypes = new HashSet<>(builder.vehicleTypes.values());
-
+        this.vehicleTypes = builder.vehicleTypes.values();
         this.initialVehicleRoutes = builder.initialRoutes;
         this.transportCosts = builder.transportCosts;
         this.activityCosts = builder.activityCosts;
         this.activityMap = builder.activityMap;
         this.nuActivities = builder.activityIndexCounter;
         this.allLocations = builder.allLocations;
-        this.allJobs = builder.tentativeJobs;
-        this.originalJobActivityFactory = builder.jobActivityFactory;
-        this.vehicleIndexCounter = builder.vehicleIndexCounter;
+        this.allJobs = new HashMap<>(jobs);
+        this.allJobs.putAll(builder.jobsInInitialRoutes);
         logger.info("setup problem: {}", this);
     }
 
@@ -651,7 +640,7 @@ public class VehicleRoutingProblem {
      * @return copied collection of initial vehicle routes
      */
     public Collection<VehicleRoute> getInitialVehicleRoutes() {
-        Collection<VehicleRoute> copiedInitialRoutes = new ArrayList<VehicleRoute>();
+        Collection<VehicleRoute> copiedInitialRoutes = new ArrayList<>();
         for (VehicleRoute route : initialVehicleRoutes) {
             copiedInitialRoutes.add(VehicleRoute.copyOf(route));
         }
@@ -728,32 +717,11 @@ public class VehicleRoutingProblem {
      * @return a copy of the activities that are associated to the specified job
      */
     public List<AbstractActivity> copyAndGetActivities(Job job) {
-        List<AbstractActivity> acts = new ArrayList<AbstractActivity>();
+        List<AbstractActivity> acts = new ArrayList<>();
         if (activityMap.containsKey(job)) {
             for (AbstractActivity act : activityMap.get(job)) acts.add((AbstractActivity) act.duplicate());
         }
         return acts;
-    }
-
-    private void addBreak(Break aBreak) {
-        if (activityMap.containsKey(aBreak))
-            return;
-
-        List<AbstractActivity> breakActivities = originalJobActivityFactory.createActivities(aBreak);
-        if (breakActivities.isEmpty())
-            throw new IllegalArgumentException("At least one activity for break needs to be created by activityFactory!");
-        for(AbstractActivity act : breakActivities) {
-            act.setIndex(nuActivities);
-            ++nuActivities;
-        }
-        activityMap.put(aBreak, breakActivities);
-    }
-
-    public void addVehicle(AbstractVehicle vehicle) {
-        vehicle.setIndex(vehicleIndexCounter++);
-        if (vehicle.getBreak() != null)
-            addBreak(vehicle.getBreak());
-        vehicles.add(vehicle);
     }
 
 }
