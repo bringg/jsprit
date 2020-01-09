@@ -69,12 +69,12 @@ public class ShipmentInsertionCalculatorFlexTest {
     VehicleRoutingActivityCosts activityCosts = new VehicleRoutingActivityCosts() {
 
         @Override
-        public double getActivityCost(TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
+        public double getActivityCost(TourActivity prevAct, TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
             return 0;
         }
 
         @Override
-        public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
+        public double getActivityDuration(TourActivity prevAct, TourActivity tourAct, double arrivalTime, Driver driver, Vehicle vehicle) {
             return tourAct.getOperationTime();
         }
 

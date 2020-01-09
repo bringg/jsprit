@@ -55,6 +55,26 @@ import java.util.*;
  * @author stefan schroeder
  */
 public class VehicleRoutingProblem {
+    private final static DefaultTourActivityFactory serviceActivityFactory = new DefaultTourActivityFactory();
+    private final static DefaultShipmentActivityFactory shipmentActivityFactory = new DefaultShipmentActivityFactory();
+
+    private final static JobActivityFactory JOB_ACTIVITY_FACTORY =  new JobActivityFactory() {
+        @Override
+        public List<AbstractActivity> createActivities(Job job) {
+            List<AbstractActivity> acts = new ArrayList<>();
+            if( job instanceof Break){
+                acts.add(BreakActivity.newInstance((Break) job));
+            }
+            else if (job instanceof Service) {
+                acts.add(serviceActivityFactory.createActivity((Service) job));
+            } else if (job instanceof Shipment) {
+                acts.add(shipmentActivityFactory.createPickup((Shipment) job));
+                acts.add(shipmentActivityFactory.createDelivery((Shipment) job));
+            }
+            return acts;
+        }
+
+    };
 
     /**
      * Builder to build the routing-problem.
@@ -95,24 +115,7 @@ public class VehicleRoutingProblem {
 
         private Set<String> addedVehicleIds = new LinkedHashSet<>();
 
-        private JobActivityFactory jobActivityFactory = new JobActivityFactory() {
-
-            @Override
-            public List<AbstractActivity> createActivities(Job job) {
-                List<AbstractActivity> acts = new ArrayList<>();
-                if( job instanceof Break){
-                    acts.add(BreakActivity.newInstance((Break) job));
-                }
-                else if (job instanceof Service) {
-                    acts.add(serviceActivityFactory.createActivity((Service) job));
-                } else if (job instanceof Shipment) {
-                    acts.add(shipmentActivityFactory.createPickup((Shipment) job));
-                    acts.add(shipmentActivityFactory.createDelivery((Shipment) job));
-                }
-                return acts;
-            }
-
-        };
+        private JobActivityFactory jobActivityFactory = JOB_ACTIVITY_FACTORY;
 
         private int vehicleIndexCounter = 1;
 
@@ -123,10 +126,6 @@ public class VehicleRoutingProblem {
         private Map<VehicleTypeKey, Integer> typeKeyIndices = new HashMap<>();
 
         private Map<Job, List<AbstractActivity>> activityMap = new HashMap<>();
-
-        private final DefaultShipmentActivityFactory shipmentActivityFactory = new DefaultShipmentActivityFactory();
-
-        private final DefaultTourActivityFactory serviceActivityFactory = new DefaultTourActivityFactory();
 
         private void incActivityIndexCounter() {
             activityIndexCounter++;
@@ -531,7 +530,7 @@ public class VehicleRoutingProblem {
      * @author sschroeder
      */
     public enum FleetSize {
-        FINITE, INFINITE
+        FINITE, INFINITE, INFINITE_WITH_BREAKS
     }
 
     /**
@@ -583,7 +582,11 @@ public class VehicleRoutingProblem {
 
         @Override
         public List<AbstractActivity> createActivities(Job job) {
-            return copyAndGetActivities(job);
+            final List<AbstractActivity> activities = copyAndGetActivities(job);
+            if (activities.isEmpty()) {
+                return JOB_ACTIVITY_FACTORY.createActivities(job);
+            }
+            return activities;
         }
 
     };
@@ -722,6 +725,34 @@ public class VehicleRoutingProblem {
             for (AbstractActivity act : activityMap.get(job)) acts.add((AbstractActivity) act.duplicate());
         }
         return acts;
+    }
+
+    private void addBreak(Break aBreak) {
+        if (activityMap.containsKey(aBreak))
+            return;
+
+        List<AbstractActivity> breakActivities = jobActivityFactory.createActivities(aBreak);
+        if (breakActivities.isEmpty())
+            throw new IllegalArgumentException("At least one activity for break needs to be created by activityFactory!");
+        for(AbstractActivity act : breakActivities) {
+            act.setIndex(nuActivities);
+            ++nuActivities;
+        }
+        activityMap.put(aBreak, breakActivities);
+    }
+
+    public void addVehicle(AbstractVehicle vehicle) {
+        vehicle.setIndex(getMaxVehicleIndex() + 1);
+        if (vehicle.getBreak() != null)
+            addBreak(vehicle.getBreak());
+        vehicles.add(vehicle);
+    }
+
+    private int getMaxVehicleIndex() {
+        int i = 0;
+        for (Vehicle v : vehicles)
+            i = Math.max(i, v.getIndex());
+        return i;
     }
 
 }

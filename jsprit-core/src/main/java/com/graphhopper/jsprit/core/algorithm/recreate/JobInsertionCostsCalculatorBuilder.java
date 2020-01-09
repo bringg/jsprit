@@ -100,6 +100,8 @@ public class JobInsertionCostsCalculatorBuilder {
 
     private JobInsertionCostsCalculatorFactory breakCalculatorFactory = new BreakInsertionCalculatorFactory();
 
+    private BreakForMultipleTimeWindowsInsertionCalculatorFactory breakForMultipleTimeWindowsInsertionCalculatorFactory = new BreakForMultipleTimeWindowsInsertionCalculatorFactory();
+
     /**
      * Constructs the builder.
      * <p>
@@ -308,15 +310,12 @@ public class JobInsertionCostsCalculatorBuilder {
             public List<AbstractActivity> createActivities(Job job) {
                 return vrp.copyAndGetActivities(job);
             }
-
         };
 
         JobInsertionCostsCalculator shipmentInsertion = shipmentCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
         JobInsertionCostsCalculator serviceInsertion = serviceCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
         JobInsertionCostsCalculator breakInsertion = breakCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
-
-        BreakForMultipleTimeWindowsInsertionCalculator breakForMultipleTimeWindowsInsertionCalculator = new BreakForMultipleTimeWindowsInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), actInsertionCalc, constraintManager);
-        breakForMultipleTimeWindowsInsertionCalculator.setJobActivityFactory(activityFactory);
+        JobInsertionCostsCalculator breakForMultipleTimeWindowsInsertionCalculator = breakForMultipleTimeWindowsInsertionCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
 
         JobCalculatorSwitcher switcher = new JobCalculatorSwitcher();
         switcher.put(Shipment.class, shipmentInsertion);

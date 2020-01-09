@@ -355,8 +355,7 @@ public class ShipmentInsertionCalculatorTest {
                 return (to.getId() != null && to.getId().equals("break")) ? .0 : super.getTransportTime(from, to, departureTime, driver, vehicle);
             }
         }, activityCosts,
-            activityInsertionCostsCalculator, constraintManager);
-        insertionCalculator.setJobActivityFactory(vrp.getJobActivityFactory());
+            activityInsertionCostsCalculator, constraintManager, vrp.getJobActivityFactory());
 
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment, vehicle, 0.0, null, Double.MAX_VALUE);
         assertEquals(0, iData.getPickupInsertionIndex());

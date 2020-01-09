@@ -172,6 +172,7 @@ public class VehicleImpl extends AbstractVehicle {
             this.endLocation = baseVehicle.getEndLocation();
             this.aBreak = baseVehicle.getBreak();
             this.userData = baseVehicle.getUserData();
+            this.prohibitedTasks.addAll(baseVehicle.getProhibitedTasks());
         }
 
         /**
