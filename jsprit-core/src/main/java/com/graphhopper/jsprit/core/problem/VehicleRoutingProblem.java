@@ -307,8 +307,12 @@ public class VehicleRoutingProblem {
                 if (act instanceof TourActivity.JobActivity) {
                     Job job = ((TourActivity.JobActivity) act).getJob();
                     jobsInInitialRoutes.put(job.getId(), job);
-                    addLocationToTentativeLocations(job);
                     registerJobAndActivity(abstractAct, job);
+                    if (act instanceof BreakActivity) {
+                        continue;
+                    }
+
+                    addLocationToTentativeLocations(job);
                 }
             }
             initialRoutes.add(route);
