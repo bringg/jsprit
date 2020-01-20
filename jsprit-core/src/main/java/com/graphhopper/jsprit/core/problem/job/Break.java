@@ -22,7 +22,7 @@ import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.Skills;
 
 /**
- * Break extends Service and is intended to model a time-window based driver break.
+ * Pickup extends Service and is intended to model a Service where smth is LOADED (i.e. picked up) to a transport unit.
  *
  * @author schroeder
  */
@@ -31,7 +31,7 @@ public class Break extends Service {
     public static class Builder extends Service.Builder<Break> {
 
         /**
-         * Returns a new instance of builder that builds a break.
+         * Returns a new instance of builder that builds a pickup.
          *
          * @param id the id of the pickup
          * @return the builder
@@ -47,9 +47,9 @@ public class Break extends Service {
         }
 
         /**
-         * Builds Break.
+         * Builds Pickup.
          * <p>
-         * <p>Pickup type is "break"
+         * <p>Pickup type is "pickup"
          *
          * @return pickup
          * @throws IllegalStateException if neither locationId nor coordinate has been set

@@ -50,25 +50,25 @@ final class BreakInsertionCalculator implements JobInsertionCostsCalculator {
 
     private static final Logger logger = LoggerFactory.getLogger(BreakInsertionCalculator.class);
 
-    private final HardRouteConstraint hardRouteLevelConstraint;
+    private HardRouteConstraint hardRouteLevelConstraint;
 
-    private final HardActivityConstraint hardActivityLevelConstraint;
+    private HardActivityConstraint hardActivityLevelConstraint;
 
-    private final SoftRouteConstraint softRouteConstraint;
+    private SoftRouteConstraint softRouteConstraint;
 
-    private final SoftActivityConstraint softActivityConstraint;
+    private SoftActivityConstraint softActivityConstraint;
 
-    private final VehicleRoutingTransportCosts transportCosts;
+    private VehicleRoutingTransportCosts transportCosts;
 
     private final VehicleRoutingActivityCosts activityCosts;
 
-    private final ActivityInsertionCostsCalculator additionalTransportCostsCalculator;
+    private ActivityInsertionCostsCalculator additionalTransportCostsCalculator;
 
-    private final JobActivityFactory activityFactory;
+    private JobActivityFactory activityFactory;
 
-    private final AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
+    private AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
 
-    public BreakInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager, JobActivityFactory activityFactory) {
+    public BreakInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager) {
         super();
         this.transportCosts = routingCosts;
         this.activityCosts = activityCosts;
@@ -78,10 +78,12 @@ final class BreakInsertionCalculator implements JobInsertionCostsCalculator {
         softRouteConstraint = constraintManager;
         this.additionalTransportCostsCalculator = additionalTransportCostsCalculator;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
-        this.activityFactory = activityFactory;
         logger.debug("initialise " + this);
     }
 
+    public void setJobActivityFactory(JobActivityFactory jobActivityFactory) {
+        this.activityFactory = jobActivityFactory;
+    }
 
     @Override
     public String toString() {

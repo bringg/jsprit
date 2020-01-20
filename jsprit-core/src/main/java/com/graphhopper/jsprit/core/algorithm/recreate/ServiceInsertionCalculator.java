@@ -55,33 +55,36 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
 
 //    private HardActivityConstraint hardActivityLevelConstraint;
 
-    private final SoftRouteConstraint softRouteConstraint;
+    private SoftRouteConstraint softRouteConstraint;
 
-    private final SoftActivityConstraint softActivityConstraint;
+    private SoftActivityConstraint softActivityConstraint;
 
-    private final VehicleRoutingTransportCosts transportCosts;
+    private VehicleRoutingTransportCosts transportCosts;
 
     private final VehicleRoutingActivityCosts activityCosts;
 
-    private final ActivityInsertionCostsCalculator activityInsertionCostsCalculator;
+    private ActivityInsertionCostsCalculator additionalTransportCostsCalculator;
 
-    private final JobActivityFactory activityFactory;
+    private JobActivityFactory activityFactory;
 
-    private final AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
+    private AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
 
-    private final ConstraintManager constraintManager;
+    private ConstraintManager constraintManager;
 
-    public ServiceInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory activityFactory) {
+    public ServiceInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager) {
         super();
         this.transportCosts = routingCosts;
         this.activityCosts = activityCosts;
         this.constraintManager = constraintManager;
         softActivityConstraint = constraintManager;
         softRouteConstraint = constraintManager;
-        this.activityInsertionCostsCalculator = activityInsertionCostsCalculator;
+        this.additionalTransportCostsCalculator = additionalTransportCostsCalculator;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
-        this.activityFactory = activityFactory;
         logger.debug("initialise {}", this);
+    }
+
+    public void setJobActivityFactory(JobActivityFactory jobActivityFactory) {
+        this.activityFactory = jobActivityFactory;
     }
 
     @Override
@@ -148,7 +151,7 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
                 ConstraintsStatus status = fulfilled(insertionContext, prevAct, deliveryAct2Insert, nextAct, prevActStartTime, failedActivityConstraints, constraintManager);
                 if (status.equals(ConstraintsStatus.FULFILLED)) {
                     double additionalICostsAtActLevel = softActivityConstraint.getCosts(insertionContext, prevAct, deliveryAct2Insert, nextAct, prevActStartTime);
-                    double additionalTransportationCosts = activityInsertionCostsCalculator.getCosts(insertionContext, prevAct, nextAct, deliveryAct2Insert, prevActStartTime);
+                    double additionalTransportationCosts = additionalTransportCostsCalculator.getCosts(insertionContext, prevAct, nextAct, deliveryAct2Insert, prevActStartTime);
                     if (additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts < bestCost) {
                         bestCost = additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts;
                         insertionIndex = actIndex;

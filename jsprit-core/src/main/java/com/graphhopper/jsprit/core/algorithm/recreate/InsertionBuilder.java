@@ -28,10 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-/**
- * use InsertionStrategyBuilder instead
- */
-@Deprecated
+
 public class InsertionBuilder {
 
     private boolean fastRegret;

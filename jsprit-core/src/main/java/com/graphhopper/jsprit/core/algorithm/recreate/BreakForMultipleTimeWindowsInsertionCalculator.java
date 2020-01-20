@@ -35,15 +35,17 @@ final class BreakForMultipleTimeWindowsInsertionCalculator implements JobInserti
 
     private AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
 
-    public BreakForMultipleTimeWindowsInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager, JobActivityFactory jobActivityFactory) {
+    public BreakForMultipleTimeWindowsInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator additionalTransportCostsCalculator, ConstraintManager constraintManager) {
         this.transportCosts = routingCosts;
         this.activityCosts = activityCosts;
         this.constraintManager = constraintManager;
         this.additionalTransportCostsCalculator = additionalTransportCostsCalculator;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
-        this.activityFactory = jobActivityFactory;
-
         logger.debug("initialise " + this);
+    }
+
+    public void setJobActivityFactory(JobActivityFactory jobActivityFactory) {
+        this.activityFactory = jobActivityFactory;
     }
 
     @Override

@@ -157,25 +157,6 @@ public class VehicleImpl extends AbstractVehicle {
         }
 
         /**
-         * This can be used to initialize the new vehicle (to be built) with another vehicle.
-         *
-         * @param baseVehicle
-         */
-        private Builder(Vehicle baseVehicle) {
-            this.id = baseVehicle.getId();
-            this.earliestStart = baseVehicle.getEarliestDeparture();
-            this.latestArrival = baseVehicle.getLatestArrival();
-            this.returnToDepot = baseVehicle.isReturnToDepot();
-            this.type = baseVehicle.getType();
-            this.skills = baseVehicle.getSkills();
-            this.startLocation = baseVehicle.getStartLocation();
-            this.endLocation = baseVehicle.getEndLocation();
-            this.aBreak = baseVehicle.getBreak();
-            this.userData = baseVehicle.getUserData();
-            this.prohibitedTasks.addAll(baseVehicle.getProhibitedTasks());
-        }
-
-        /**
          * Sets the {@link VehicleType}.<br>
          *
          * @param type the type to be set
@@ -332,16 +313,6 @@ public class VehicleImpl extends AbstractVehicle {
             return new Builder(vehicleId);
         }
 
-        /**
-         * Returns new instance of vehicle builder and initializes every attribute with a attributes of baseVehicle
-         *
-         * @param baseVehicle
-         * @return
-         */
-        public static Builder newInstance(Vehicle baseVehicle) {
-            return new Builder(baseVehicle);
-        }
-
         public Builder addSkills(Skills skills) {
             this.skillBuilder.addAllSkills(skills.values());
             return this;
@@ -351,16 +322,6 @@ public class VehicleImpl extends AbstractVehicle {
             this.aBreak = aBreak;
             return this;
         }
-    }
-
-    /**
-     * Returns a simple copy of vehicle.
-     *
-     * @param vehicle
-     * @return
-     */
-    public static Vehicle copyOf(Vehicle vehicle) {
-        return VehicleImpl.Builder.newInstance(vehicle).build();
     }
 
     /**
