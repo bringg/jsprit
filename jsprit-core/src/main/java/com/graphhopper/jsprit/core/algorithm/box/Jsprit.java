@@ -28,6 +28,7 @@ import com.graphhopper.jsprit.core.algorithm.listener.AlgorithmEndsListener;
 import com.graphhopper.jsprit.core.algorithm.listener.IterationStartsListener;
 import com.graphhopper.jsprit.core.algorithm.module.RuinAndRecreateModule;
 import com.graphhopper.jsprit.core.algorithm.recreate.*;
+import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionListener;
 import com.graphhopper.jsprit.core.algorithm.ruin.*;
 import com.graphhopper.jsprit.core.algorithm.ruin.distance.AvgServiceAndShipmentDistance;
 import com.graphhopper.jsprit.core.algorithm.selector.SelectBest;
@@ -188,6 +189,7 @@ public class Jsprit {
         private RuinWorst worst = null;
         private RuinClusters clusters = null;
         private RuinString stringRuin = null;
+        private Collection<InsertionListener> insertionListeners = new HashSet<>();
 
         public static Builder newInstance(VehicleRoutingProblem vrp) {
             return new Builder(vrp);
@@ -362,6 +364,12 @@ public class Jsprit {
             return this;
         }
 
+        public Builder addInsertionListener(InsertionListener insertionListener) {
+            insertionListeners.add(insertionListener);
+            return this;
+        }
+
+
         public VehicleRoutingAlgorithm buildAlgorithm() {
             return new Jsprit(this).create(vrp);
         }
@@ -436,6 +444,7 @@ public class Jsprit {
     private RuinWorst worst;
     private RuinClusters clusters;
     private RuinString stringRuin;
+    private Collection<InsertionListener> insertionListeners;
 
     private Jsprit(Builder builder) {
         this.stateManager = builder.stateManager;
@@ -458,6 +467,7 @@ public class Jsprit {
         worst = builder.worst;
         clusters = builder.clusters;
         stringRuin = builder.stringRuin;
+        insertionListeners = builder.insertionListeners;
     }
 
     private void ini(VehicleRoutingProblem vrp) {
@@ -531,17 +541,17 @@ public class Jsprit {
         radial = radial == null ? new RuinRadial(vrp, vrp.getJobs().size(), jobNeighborhoods) : radial;
         radial.setRandom(random);
         radial.setRuinShareFactory(new RuinShareFactoryImpl(
-                toInteger(properties.getProperty(Parameter.RADIAL_MIN_SHARE.toString())),
-                toInteger(properties.getProperty(Parameter.RADIAL_MAX_SHARE.toString())),
-                random)
+            toInteger(properties.getProperty(Parameter.RADIAL_MIN_SHARE.toString())),
+            toInteger(properties.getProperty(Parameter.RADIAL_MAX_SHARE.toString())),
+            random)
         );
 
         random_for_regret = random_for_regret == null ? new RuinRandom(vrp, 0.5) : random_for_regret;
         random_for_regret.setRandom(random);
         random_for_regret.setRuinShareFactory(new RuinShareFactoryImpl(
-                toInteger(properties.getProperty(Parameter.RANDOM_REGRET_MIN_SHARE.toString())),
-                toInteger(properties.getProperty(Parameter.RANDOM_REGRET_MAX_SHARE.toString())),
-                random)
+            toInteger(properties.getProperty(Parameter.RANDOM_REGRET_MIN_SHARE.toString())),
+            toInteger(properties.getProperty(Parameter.RANDOM_REGRET_MAX_SHARE.toString())),
+            random)
         );
 
         random_for_best = random_for_best == null ? new RuinRandom(vrp, 0.5) : random_for_best;
@@ -563,9 +573,9 @@ public class Jsprit {
         worst = worst == null ? new RuinWorst(vrp, (int) (vrp.getJobs().values().size() * 0.5)) : worst;
         worst.setRandom(random);
         worst.setRuinShareFactory(new RuinShareFactoryImpl(
-                toInteger(properties.getProperty(Parameter.WORST_MIN_SHARE.toString())),
-                toInteger(properties.getProperty(Parameter.WORST_MAX_SHARE.toString())),
-                random)
+            toInteger(properties.getProperty(Parameter.WORST_MIN_SHARE.toString())),
+            toInteger(properties.getProperty(Parameter.WORST_MAX_SHARE.toString())),
+            random)
         );
         IterationStartsListener noise = new IterationStartsListener() {
             @Override
@@ -585,9 +595,9 @@ public class Jsprit {
         clusters = clusters == null ? new RuinClusters(vrp, (int) (vrp.getJobs().values().size() * 0.5), jobNeighborhoods) : clusters;
         clusters.setRandom(random);
         clusters.setRuinShareFactory(new RuinShareFactoryImpl(
-                toInteger(properties.getProperty(Parameter.WORST_MIN_SHARE.toString())),
-                toInteger(properties.getProperty(Parameter.WORST_MAX_SHARE.toString())),
-                random)
+            toInteger(properties.getProperty(Parameter.WORST_MIN_SHARE.toString())),
+            toInteger(properties.getProperty(Parameter.WORST_MAX_SHARE.toString())),
+            random)
         );
 
         int kMin = toInteger(properties.getProperty(Parameter.STRING_K_MIN.toString()));
@@ -687,6 +697,7 @@ public class Jsprit {
             .setActivityInsertionCostCalculator(activityInsertion)
             .build();
         randomInsertion.setRandom(random);
+        addAllListeners(new AbstractInsertionStrategy[]{best, randomInsertion, regret});
 
         IterationStartsListener schrimpfThreshold = null;
         if(acceptor == null) {
@@ -790,6 +801,13 @@ public class Jsprit {
         vra.setMaxIterations(Integer.valueOf(properties.getProperty(Parameter.ITERATIONS.toString())));
 
         return vra;
+
+    }
+
+    private void addAllListeners(AbstractInsertionStrategy... insertionStrategies) {
+        for (InsertionListener listener : insertionListeners)
+            for (AbstractInsertionStrategy insertion : insertionStrategies)
+                insertion.addListener(listener);
 
     }
 
@@ -897,3 +915,4 @@ public class Jsprit {
 
 
 }
+
