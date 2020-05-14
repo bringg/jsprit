@@ -697,7 +697,6 @@ public class Jsprit {
             .setActivityInsertionCostCalculator(activityInsertion)
             .build();
         randomInsertion.setRandom(random);
-        addAllListeners(new AbstractInsertionStrategy[]{best, randomInsertion, regret});
 
         IterationStartsListener schrimpfThreshold = null;
         if(acceptor == null) {
@@ -792,6 +791,8 @@ public class Jsprit {
         vra.addListener(noiseConfigurator);
         vra.addListener(noise);
         vra.addListener(clusters);
+        addAllListeners(vra, new AbstractInsertionStrategy[]{best, randomInsertion, regret});
+
         if (increasingAbsoluteFixedCosts != null) vra.addListener(increasingAbsoluteFixedCosts);
 
         if(toBoolean(getProperty(Parameter.BREAK_SCHEDULING.toString()))) {
@@ -804,10 +805,13 @@ public class Jsprit {
 
     }
 
-    private void addAllListeners(AbstractInsertionStrategy... insertionStrategies) {
-        for (InsertionListener listener : insertionListeners)
-            for (AbstractInsertionStrategy insertion : insertionStrategies)
+    private void addAllListeners(VehicleRoutingAlgorithm vra, AbstractInsertionStrategy... insertionStrategies) {
+        for (InsertionListener listener : insertionListeners) {
+            for (AbstractInsertionStrategy insertion : insertionStrategies) {
                 insertion.addListener(listener);
+            }
+            vra.addListener(listener);
+        }
 
     }
 
