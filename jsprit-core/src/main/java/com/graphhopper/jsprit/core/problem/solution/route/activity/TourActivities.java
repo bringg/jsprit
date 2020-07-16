@@ -272,9 +272,9 @@ public class TourActivities {
     }
 
     public Iterator<TourActivity> reverseActivityIterator() {
-        if (backward == null) backward = new ReverseActivityIterator(tourActivities);
-        else backward.reset();
-        return backward;
+        /*if (backward == null) backward = new ReverseActivityIterator(tourActivities);
+        else backward.reset();*/
+        return new ReverseActivityIterator(tourActivities);
     }
 
 
