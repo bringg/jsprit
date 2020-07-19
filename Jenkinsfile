@@ -1,4 +1,5 @@
 #!groovy
+@Library('ci-scripts@roman') _
 
 pipeline {
     agent {
@@ -19,6 +20,18 @@ pipeline {
                     sh 'curl -s https://codecov.io/bash | bash'
                 }
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                deployToNexus()
+            }
+        }
+    }
+
+    post {
+        always {
+            pipelineUtils('cleanWorkSpace')
         }
     }
 }
