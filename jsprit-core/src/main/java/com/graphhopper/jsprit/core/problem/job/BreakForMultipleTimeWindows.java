@@ -52,6 +52,4 @@ public class BreakForMultipleTimeWindows extends Service {
     public boolean hasVariableLocation() {
         return variableLocation;
     }
-
-
 }
