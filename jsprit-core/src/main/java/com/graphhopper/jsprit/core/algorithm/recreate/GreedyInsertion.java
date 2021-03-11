@@ -22,7 +22,7 @@ public class GreedyInsertion extends RegretInsertion {
     Map<String, Collection<Job>> jobsThaHavToBeInSameRoute = new HashMap<>();
     Map<String, Integer> jobsThaHavToBeInSameRouteSize = new HashMap<>();
     private final JobInsertionCostsCalculator bestInsertionCalculator;
-
+    
     Comparator<Job> withMostNeighborsComparator = new Comparator<Job>() {
         @Override
         public int compare(Job job1, Job job2) {
@@ -87,6 +87,7 @@ public class GreedyInsertion extends RegretInsertion {
                     if (iData instanceof InsertionData.NoInsertionFound) {
                         failedToInsert.add(job);
                     } else {
+                        insertJob(job, iData, route);
                         jobsToInsert.remove(job);
                     }
                 }
