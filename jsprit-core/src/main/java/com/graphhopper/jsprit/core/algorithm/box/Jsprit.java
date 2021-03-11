@@ -85,7 +85,8 @@ public class Jsprit {
         CLUSTER_REGRET("cluster_regret"),
         STRING_BEST("string_best"),
         STRING_REGRET("string_regret"),
-        RANDOM("random");
+        RANDOM("random"),
+        GREEDY_REGRET("greedy_regret");
 
         String strategyName;
 
@@ -209,6 +210,8 @@ public class Jsprit {
             defaults.put(Strategy.STRING_REGRET.toString(), "0.0");
 
             defaults.put(Strategy.RANDOM.toString(), "0.0");
+
+            defaults.put(Strategy.GREEDY_REGRET.toString(), "0.0");
 
             defaults.put(Parameter.STRING_K_MIN.toString(), "1");
             defaults.put(Parameter.STRING_K_MAX.toString(), "6");
@@ -688,6 +691,14 @@ public class Jsprit {
             .build();
         randomInsertion.setRandom(random);
 
+        final AbstractInsertionStrategy greedyInsertion = (AbstractInsertionStrategy) new InsertionBuilder(vrp, vehicleFleetManager, stateManager, constraintManager)
+            .setInsertionStrategy(InsertionBuilder.Strategy.GREEDY)
+            .considerFixedCosts(Double.valueOf(properties.getProperty(Parameter.FIXED_COST_PARAM.toString())))
+            .setAllowVehicleSwitch(toBoolean(getProperty(Parameter.VEHICLE_SWITCH.toString())))
+            .setActivityInsertionCostCalculator(activityInsertion)
+            .build();
+        greedyInsertion.setRandom(random);
+
         IterationStartsListener schrimpfThreshold = null;
         if(acceptor == null) {
             final SchrimpfAcceptance schrimpfAcceptance = new SchrimpfAcceptance(1, toDouble(getProperty(Parameter.THRESHOLD_ALPHA.toString())));
@@ -741,6 +752,9 @@ public class Jsprit {
         final SearchStrategy randomStrategy = new SearchStrategy(Strategy.RANDOM.toString(), new SelectRandomly(), acceptor, objectiveFunction);
         randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), randomInsertion, random_for_random));
 
+        final SearchStrategy greedyStrategy = new SearchStrategy(Strategy.GREEDY_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
+        randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), greedyInsertion, clusters));
+
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
         if (addCoreConstraints) {
@@ -757,7 +771,8 @@ public class Jsprit {
             .withStrategy(clusters_best, toDouble(getProperty(Strategy.CLUSTER_BEST.toString())))
             .withStrategy(stringBest, toDouble(getProperty(Strategy.STRING_BEST.toString())))
             .withStrategy(stringRegret, toDouble(getProperty(Strategy.STRING_REGRET.toString())))
-            .withStrategy(randomStrategy, toDouble((getProperty(Strategy.RANDOM.toString()))));
+            .withStrategy(randomStrategy, toDouble((getProperty(Strategy.RANDOM.toString()))))
+            .withStrategy(greedyStrategy, toDouble((getProperty(Strategy.GREEDY_REGRET.toString()))));
 
         for (SearchStrategy customStrategy : customStrategies.keySet()) {
             prettyBuilder.withStrategy(customStrategy, customStrategies.get(customStrategy));
