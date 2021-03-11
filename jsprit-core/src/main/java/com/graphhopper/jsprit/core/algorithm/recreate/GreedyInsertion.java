@@ -48,7 +48,7 @@ public class GreedyInsertion extends RegretInsertion {
             HashSet<Job> nearestJobs = new HashSet<>();
             while (nearestNeighborsIterator.hasNext()) {
                 Job next = nearestNeighborsIterator.next();
-                if (distanceDiffForSameLocation >= vrp.getTransportCosts().getTransportTime(location, getLocation(next), 0, DriverImpl.noDriver(), VehicleImpl.createNoVehicle()))
+                if (distanceDiffForSameLocation >= vrp.getTransportCosts().getDistance(location, getLocation(next), 0, VehicleImpl.createNoVehicle()))
                     nearestJobs.add(next);
                 else break;
             }
