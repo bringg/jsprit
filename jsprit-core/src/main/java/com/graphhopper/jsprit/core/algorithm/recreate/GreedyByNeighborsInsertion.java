@@ -40,6 +40,12 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
         initializeNeighbors();
     }
 
+
+    @Override
+    public String toString() {
+        return "[name=greedyByNeighborhoodInsertion]";
+    }
+
     Map<String, Integer> initializeNeighbors() {
         JobNeighborhoods neighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vrp, new AvgServiceAndShipmentDistance(vrp.getTransportCosts()));
         neighborhoods.initialise();
