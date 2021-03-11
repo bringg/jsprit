@@ -70,8 +70,8 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
         Set<Job> failedToAssign = new HashSet<>();
         List<Job> jobsToInsert = new ArrayList<>(unassignedJobs);
 
+        Collections.sort(jobsToInsert, withMostNeighborsComparator);
         while (!jobsToInsert.isEmpty()) {
-            Collections.sort(jobsToInsert, withMostNeighborsComparator);
             Job withMostNeighbors = jobsToInsert.remove(0);
             failedToAssign.addAll(insertJobWithNearest(vehicleRoutes, withMostNeighbors, jobsToInsert));
         }
@@ -91,9 +91,7 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
             for (Job job : jobCollection) {
                 if (jobsToInsert.contains(job)) {
                     InsertionData iData = bestInsertionCalculator.getInsertionData(route, job, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
-                    if (iData instanceof InsertionData.NoInsertionFound) {
-                        failedToInsert.add(job);
-                    } else {
+                    if (!(iData instanceof InsertionData.NoInsertionFound)) {
                         insertJob(job, iData, route);
                         jobsToInsert.remove(job);
                     }
