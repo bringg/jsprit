@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
-public class GreedyInsertionTest extends TestCase {
+public class GreedyByNeighborsInsertionTest extends TestCase {
 
     @Test
     public void testJobsInsertedByMostNeighbors() {
@@ -41,8 +41,8 @@ public class GreedyInsertionTest extends TestCase {
                     .build()
             ).build();
         JobInsertionCostsCalculator jobInsertionCostsCalculator = mock(JobInsertionCostsCalculator.class);
-        GreedyInsertion greedyInsertion = new GreedyInsertion(jobInsertionCostsCalculator, vrp);
-        Map<String, Integer> neighbors = greedyInsertion.initializeNeighbors();
+        GreedyByNeighborsInsertion greedyByNeighborsInsertion = new GreedyByNeighborsInsertion(jobInsertionCostsCalculator, vrp, 100);
+        Map<String, Integer> neighbors = greedyByNeighborsInsertion.initializeNeighbors();
         assertEquals(2, neighbors.get("1"), 0);
         assertEquals(2, neighbors.get("2"), 0);
         assertEquals(2, neighbors.get("3"), 0);

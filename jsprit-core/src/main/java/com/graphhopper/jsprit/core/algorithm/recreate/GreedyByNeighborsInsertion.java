@@ -16,13 +16,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class GreedyInsertion extends RegretInsertion {
+public class GreedyByNeighborsInsertion extends RegretInsertion {
+    final double distanceDiffForSameLocation;
     private static Logger logger = LoggerFactory.getLogger(BestInsertion.class);
 
     Map<String, Collection<Job>> jobsThaHavToBeInSameRoute = new HashMap<>();
     Map<String, Integer> jobsThaHavToBeInSameRouteSize = new HashMap<>();
     private final JobInsertionCostsCalculator bestInsertionCalculator;
-    
+
     Comparator<Job> withMostNeighborsComparator = new Comparator<Job>() {
         @Override
         public int compare(Job job1, Job job2) {
@@ -32,14 +33,14 @@ public class GreedyInsertion extends RegretInsertion {
         }
     };
 
-    public GreedyInsertion(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem) {
+    public GreedyByNeighborsInsertion(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, double distanceDiffForSameLocationMeter) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
+        this.distanceDiffForSameLocation = distanceDiffForSameLocationMeter;
         bestInsertionCalculator = jobInsertionCalculator;
         initializeNeighbors();
     }
 
     Map<String, Integer> initializeNeighbors() {
-        double distanceDiffForSameLocation = 100;
         JobNeighborhoods neighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vrp, new AvgServiceAndShipmentDistance(vrp.getTransportCosts()));
         neighborhoods.initialise();
         for (Job job : vrp.getJobs().values()) {
