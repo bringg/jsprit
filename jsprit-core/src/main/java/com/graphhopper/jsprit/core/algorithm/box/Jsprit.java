@@ -59,7 +59,7 @@ public class Jsprit {
 
     public enum Construction {
 
-        BEST_INSERTION("best_insertion"), REGRET_INSERTION("regret_insertion"), RANDOM("random");
+        BEST_INSERTION("best_insertion"), REGRET_INSERTION("regret_insertion"), RANDOM("random"), GREEDY_REGRET("greedy_regret");
 
         String name;
 
@@ -780,6 +780,8 @@ public class Jsprit {
 
         if (getProperty(Parameter.CONSTRUCTION.toString()).equals(Construction.RANDOM.toString())) {
             prettyBuilder.constructInitialSolutionWith(randomInsertion, objectiveFunction);
+        } else if (getProperty(Parameter.CONSTRUCTION.toString()).equals(Construction.GREEDY_REGRET.toString())) {
+            prettyBuilder.constructInitialSolutionWith(greedyInsertion, objectiveFunction);
         } else if (getProperty(Parameter.CONSTRUCTION.toString()).equals(Construction.BEST_INSERTION.toString())) {
             prettyBuilder.constructInitialSolutionWith(best, objectiveFunction);
         } else {
