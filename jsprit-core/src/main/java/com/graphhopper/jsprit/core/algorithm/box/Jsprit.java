@@ -753,7 +753,7 @@ public class Jsprit {
         randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), randomInsertion, random_for_random));
 
         final SearchStrategy greedyStrategy = new SearchStrategy(Strategy.GREEDY_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
-        randomStrategy.addModule(new RuinAndRecreateModule(Strategy.RANDOM.toString(), greedyInsertion, clusters));
+        randomStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_REGRET.toString(), greedyInsertion, clusters));
 
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
