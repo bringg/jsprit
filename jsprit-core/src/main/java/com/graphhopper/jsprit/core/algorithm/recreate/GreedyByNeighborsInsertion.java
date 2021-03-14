@@ -36,7 +36,7 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
     public GreedyByNeighborsInsertion(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, double distanceDiffForSameLocationMeter) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
         this.distanceDiffForSameLocation = distanceDiffForSameLocationMeter;
-        bestInsertionCalculator = jobInsertionCalculator;
+        this.bestInsertionCalculator = jobInsertionCalculator;
         initializeNeighbors();
     }
 
