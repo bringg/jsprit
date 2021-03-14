@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class GreedyByNeighborsInsertion extends RegretInsertion {
+public class GreedyByNeighborsInsertion extends GreedyInsertion {
     final double distanceDiffForSameLocation;
-    private static Logger logger = LoggerFactory.getLogger(BestInsertion.class);
+    private static Logger logger = LoggerFactory.getLogger(GreedyByNeighborsInsertion.class);
 
     Map<String, Collection<Job>> jobsThaHavToBeInSameRoute = new HashMap<>();
     Map<String, Integer> jobsThaHavToBeInSameRouteSize = new HashMap<>();
@@ -102,21 +102,5 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
         }
 
         return failedToInsert;
-    }
-
-    private static VehicleRoute findRoute(Collection<VehicleRoute> routes, Job job) {
-        for (VehicleRoute r : routes) {
-            if (r.getTourActivities().servesJob(job))
-                return r;
-        }
-        return null;
-    }
-
-    private final static Location getLocation(Job job) {
-        if (job instanceof Service)
-            return ((Service) job).getLocation();
-        if (job instanceof Shipment)
-            return ((Shipment) job).getDeliveryLocation();
-        return null;
     }
 }

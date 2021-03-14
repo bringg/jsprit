@@ -17,9 +17,11 @@
  */
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
+import com.graphhopper.jsprit.core.algorithm.PrettyAlgorithmBuilder;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
 import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionListener;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleFleetManager;
@@ -38,7 +40,7 @@ public class InsertionBuilder {
 
 
     public enum Strategy {
-        REGRET, BEST, RANDOM, GREEDY_BY_NEIGHBORS
+        REGRET, BEST, RANDOM, GREEDY_BY_NEIGHBORS, GREEDY_BY_DISTANCE_FROM_DEPOT
     }
 
     private VehicleRoutingProblem vrp;
@@ -156,6 +158,8 @@ public class InsertionBuilder {
     }
 
 
+
+
     public InsertionStrategy build() {
         List<InsertionListener> iListeners = new ArrayList<InsertionListener>();
         List<VehicleRoutingAlgorithmListeners.PrioritizedVRAListener> algorithmListeners = new ArrayList<VehicleRoutingAlgorithmListeners.PrioritizedVRAListener>();
@@ -212,8 +216,10 @@ public class InsertionBuilder {
             }
         } else if (strategy.equals(Strategy.RANDOM)) {
             insertion = new RandomInsertion(costCalculator, vrp);
-        }  else if (strategy.equals(Strategy.GREEDY_BY_NEIGHBORS)) {
+        } else if (strategy.equals(Strategy.GREEDY_BY_NEIGHBORS)) {
             insertion = new GreedyByNeighborsInsertion(costCalculator, vrp, distanceDiffForNeighbors);
+        }  else if (strategy.equals(Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT)) {
+            insertion = new GreedyInsertionByDistanceFromDepot(costCalculator, vrp);
         } else throw new IllegalStateException("you should never get here");
         for (InsertionListener l : iListeners) insertion.addListener(l);
         return insertion;
