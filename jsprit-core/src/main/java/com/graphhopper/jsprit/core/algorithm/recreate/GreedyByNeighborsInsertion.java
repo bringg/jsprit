@@ -40,6 +40,12 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
         initializeNeighbors();
     }
 
+
+    @Override
+    public String toString() {
+        return "[name=greedyByNeighborhoodInsertion]";
+    }
+
     Map<String, Integer> initializeNeighbors() {
         JobNeighborhoods neighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vrp, new AvgServiceAndShipmentDistance(vrp.getTransportCosts()));
         neighborhoods.initialise();
@@ -64,8 +70,8 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
         Set<Job> failedToAssign = new HashSet<>();
         List<Job> jobsToInsert = new ArrayList<>(unassignedJobs);
 
+        Collections.sort(jobsToInsert, withMostNeighborsComparator);
         while (!jobsToInsert.isEmpty()) {
-            Collections.sort(jobsToInsert, withMostNeighborsComparator);
             Job withMostNeighbors = jobsToInsert.remove(0);
             failedToAssign.addAll(insertJobWithNearest(vehicleRoutes, withMostNeighbors, jobsToInsert));
         }
@@ -80,27 +86,27 @@ public class GreedyByNeighborsInsertion extends RegretInsertion {
             return failedToInsert;
 
         VehicleRoute route = findRoute(vehicleRoutes, withMostNeighbors);
-        if (jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId())) {
+        if (route != null && jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId())) {
             Collection<Job> jobCollection = jobsThaHavToBeInSameRoute.get(withMostNeighbors.getId());
             for (Job job : jobCollection) {
                 if (jobsToInsert.contains(job)) {
                     InsertionData iData = bestInsertionCalculator.getInsertionData(route, job, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
-                    if (iData instanceof InsertionData.NoInsertionFound) {
-                        failedToInsert.add(job);
-                    } else {
-                        insertJob(job, iData, route);
+                    if (!(iData instanceof InsertionData.NoInsertionFound)) {
+                        super.insertJob(job, iData, route);
                         jobsToInsert.remove(job);
                     }
                 }
             }
+        } else {
+            logger.error("this should not happen route {} jobsThaHavToBeInSameRoute contains key {}", route, jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId()));
         }
 
         return failedToInsert;
     }
 
-    private VehicleRoute findRoute(Collection<VehicleRoute> routes, Job job) {
-        for(VehicleRoute r : routes){
-            if(r.getTourActivities().servesJob(job))
+    private static VehicleRoute findRoute(Collection<VehicleRoute> routes, Job job) {
+        for (VehicleRoute r : routes) {
+            if (r.getTourActivities().servesJob(job))
                 return r;
         }
         return null;

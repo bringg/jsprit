@@ -774,8 +774,8 @@ public class Jsprit {
             .withStrategy(clusters_best, toDouble(getProperty(Strategy.CLUSTER_BEST.toString())))
             .withStrategy(stringBest, toDouble(getProperty(Strategy.STRING_BEST.toString())))
             .withStrategy(stringRegret, toDouble(getProperty(Strategy.STRING_REGRET.toString())))
-            .withStrategy(randomStrategy, toDouble((getProperty(Strategy.RANDOM.toString()))))
-            .withStrategy(greedyByNeighborsStrategy, toDouble((getProperty(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString()))));
+            .withStrategy(randomStrategy, toDouble(getProperty(Strategy.RANDOM.toString())))
+            .withStrategy(greedyByNeighborsStrategy, toDouble(getProperty(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString())));
 
         for (SearchStrategy customStrategy : customStrategies.keySet()) {
             prettyBuilder.withStrategy(customStrategy, customStrategies.get(customStrategy));
