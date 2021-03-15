@@ -549,6 +549,7 @@ public class JspritTest {
                 assertTrue(searchStrategy.getSolutionSelector() instanceof SelectRandomly);
                 final SearchStrategyModule searchStrategyModule = searchStrategy.getSearchStrategyModules().iterator().next();
                 assertTrue(searchStrategyModule instanceof RuinAndRecreateModule);
+                System.out.println(searchStrategyModule.getName() + " _ " + searchStrategy.getId());
                 assertTrue(searchStrategyModule.getName().equals(searchStrategy.getId()));
             }
         }
