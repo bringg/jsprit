@@ -216,6 +216,7 @@ public class Jsprit {
             defaults.put(Strategy.RANDOM.toString(), "0.0");
 
             defaults.put(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), "0.0");
+            defaults.put(Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET.toString(), "0.0");
 
             defaults.put(Parameter.STRING_K_MIN.toString(), "1");
             defaults.put(Parameter.STRING_K_MAX.toString(), "6");
