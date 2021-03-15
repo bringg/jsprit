@@ -265,7 +265,7 @@ public class Jsprit {
             defaults.put(Parameter.PROPORTION_UNASSIGNED.toString(), String.valueOf(1.0));
 
             defaults.put(Parameter.DISTANCE_DIFF_FOR_SAME_NEIGHBORHOOD.toString(), String.valueOf(100));
-
+            
             return defaults;
         }
 
