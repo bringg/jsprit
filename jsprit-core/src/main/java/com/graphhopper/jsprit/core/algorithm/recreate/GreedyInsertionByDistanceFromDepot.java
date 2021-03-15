@@ -20,7 +20,6 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
     private static Logger logger = LoggerFactory.getLogger(GreedyInsertionByDistanceFromDepot.class);
 
     Map<String, Double> distanceFromDepot = new HashMap<>();
-    private final JobInsertionCostsCalculator bestInsertionCalculator;
     Map<String, Iterator<Job>> jobNeighbors = new HashMap<>();
 
     Comparator<Job> nearestToDepotComparator = new Comparator<Job>() {
@@ -34,7 +33,6 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
 
     public GreedyInsertionByDistanceFromDepot(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
-        this.bestInsertionCalculator = jobInsertionCalculator;
         initialize(vehicleRoutingProblem);
     }
 
@@ -67,8 +65,8 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
 
     @Override
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
-        Set<Job> failedToAssign = new HashSet<>();
         List<Job> jobsToInsert = new ArrayList<>(unassignedJobs);
+        Set<Job> failedToAssign = new HashSet<>(insertBreaks(vehicleRoutes, jobsToInsert));
         List<VehicleRoute> openRoutes = new ArrayList<>(vehicleRoutes);
 
         Collections.sort(jobsToInsert, nearestToDepotComparator);
@@ -86,7 +84,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
         if (!failedToInsert.isEmpty())
             return failedToInsert;
 
-        VehicleRoute route = findRoute(openRoutes, withMostNeighbors);
+        VehicleRoute route = findRouteThatServesJob(openRoutes, withMostNeighbors);
         if (!vehicleRoutes.contains(route))
             vehicleRoutes.add(route);
 

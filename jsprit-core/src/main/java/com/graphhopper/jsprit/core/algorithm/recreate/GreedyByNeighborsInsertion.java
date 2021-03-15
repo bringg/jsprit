@@ -5,10 +5,7 @@ import com.graphhopper.jsprit.core.algorithm.ruin.JobNeighborhoodsFactory;
 import com.graphhopper.jsprit.core.algorithm.ruin.distance.AvgServiceAndShipmentDistance;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.driver.DriverImpl;
 import com.graphhopper.jsprit.core.problem.job.Job;
-import com.graphhopper.jsprit.core.problem.job.Service;
-import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import org.slf4j.Logger;
@@ -22,7 +19,6 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
 
     Map<String, Collection<Job>> jobsThaHavToBeInSameRoute = new HashMap<>();
     Map<String, Integer> jobsThaHavToBeInSameRouteSize = new HashMap<>();
-    private final JobInsertionCostsCalculator bestInsertionCalculator;
 
     Comparator<Job> withMostNeighborsComparator = new Comparator<Job>() {
         @Override
@@ -36,7 +32,6 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
     public GreedyByNeighborsInsertion(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, double distanceDiffForSameLocationMeter) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
         this.distanceDiffForSameLocation = distanceDiffForSameLocationMeter;
-        this.bestInsertionCalculator = jobInsertionCalculator;
         initializeNeighbors();
     }
 
@@ -67,8 +62,8 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
 
     @Override
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
-        Set<Job> failedToAssign = new HashSet<>();
         List<Job> jobsToInsert = new ArrayList<>(unassignedJobs);
+        Set<Job> failedToAssign = new HashSet<>(insertBreaks(vehicleRoutes, jobsToInsert));
 
         Collections.sort(jobsToInsert, withMostNeighborsComparator);
         while (!jobsToInsert.isEmpty()) {
@@ -85,7 +80,7 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
         if (!failedToInsert.isEmpty())
             return failedToInsert;
 
-        VehicleRoute route = findRoute(vehicleRoutes, withMostNeighbors);
+        VehicleRoute route = findRouteThatServesJob(vehicleRoutes, withMostNeighbors);
         if (route != null && jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId())) {
             Collection<Job> jobCollection = jobsThaHavToBeInSameRoute.get(withMostNeighbors.getId());
             for (Job job : jobCollection) {
