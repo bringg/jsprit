@@ -86,7 +86,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
 
             VehicleRoute nextRoute = openRoutes.get(random.nextInt(openRoutes.size()));
             Job nearestJob;
-            if (nextRoute.isEmpty()) {
+            if (nextRoute.isEmpty() || routeWithBreakOnly(nextRoute)) {
                 Iterator<Job> nearestJobsIter = nearestJobByVehicleTypeIdentiffier.get(nextRoute.getVehicle().getVehicleTypeIdentifier()).iterator();
                 nearestJob = nearestJobsIter.next();
                 while (!jobsToInsert.contains(nearestJob) && nearestJobsIter.hasNext()) {
@@ -101,6 +101,10 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
             insertJobWithNearest(openRoutes, nextRoute, nearestJob, jobsToInsert);
         }
         return failedToAssign;
+    }
+
+    private boolean routeWithBreakOnly(VehicleRoute nextRoute) {
+        return nextRoute.getTourActivities().getJobs().size() == 1 && nextRoute.getTourActivities().getJobs().iterator().next() instanceof Break;
     }
 
     private void insertJobWithNearest(Collection<VehicleRoute> openRoutes, VehicleRoute route, Job jobToInsert, List<Job> jobsToInsert) {
