@@ -528,14 +528,17 @@ public class JspritTest {
             .setProperty(Jsprit.Strategy.RANDOM, "0.01")
             .setProperty(Jsprit.Strategy.RANDOM_BEST, "0")
             .setProperty(Jsprit.Strategy.WORST_REGRET, "0")
+            .setProperty(Jsprit.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET, "0.5")
             .setProperty(Jsprit.Strategy.GREEDY_BY_NEIGHBORS_REGRET, "0.5")
             .buildAlgorithm();
 
         final List<SearchStrategy> strategies = vra.getSearchStrategyManager().getStrategies();
-        assertEquals(5, strategies.size());
+        assertEquals(6, strategies.size());
 
         for (SearchStrategy searchStrategy : strategies) {
-            if (!searchStrategy.getId().equals(Jsprit.Strategy.RANDOM.strategyName) && !searchStrategy.getId().equals(Jsprit.Strategy.GREEDY_BY_NEIGHBORS_REGRET.strategyName)) {
+            if (!searchStrategy.getId().equals(Jsprit.Strategy.RANDOM.strategyName) &&
+                !searchStrategy.getId().equals(Jsprit.Strategy.GREEDY_BY_NEIGHBORS_REGRET.strategyName) &&
+                !searchStrategy.getId().equals(Jsprit.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET.strategyName)) {
                 assertTrue(searchStrategy.getSolutionAcceptor() instanceof AcceptNewRemoveFirst);
                 assertTrue(searchStrategy.getSolutionSelector() instanceof SelectBest);
                 final SearchStrategyModule searchStrategyModule = searchStrategy.getSearchStrategyModules().iterator().next();
@@ -546,6 +549,7 @@ public class JspritTest {
                 assertTrue(searchStrategy.getSolutionSelector() instanceof SelectRandomly);
                 final SearchStrategyModule searchStrategyModule = searchStrategy.getSearchStrategyModules().iterator().next();
                 assertTrue(searchStrategyModule instanceof RuinAndRecreateModule);
+                System.out.println(searchStrategyModule.getName() + " _ " + searchStrategy.getId());
                 assertTrue(searchStrategyModule.getName().equals(searchStrategy.getId()));
             }
         }

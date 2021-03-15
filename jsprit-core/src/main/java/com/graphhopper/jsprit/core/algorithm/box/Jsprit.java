@@ -265,7 +265,7 @@ public class Jsprit {
             defaults.put(Parameter.PROPORTION_UNASSIGNED.toString(), String.valueOf(1.0));
 
             defaults.put(Parameter.DISTANCE_DIFF_FOR_SAME_NEIGHBORHOOD.toString(), String.valueOf(100));
-            
+
             return defaults;
         }
 
@@ -772,7 +772,7 @@ public class Jsprit {
         greedyByNeighborsStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), greedyByNeighborsInsertion, clusters));
 
         final SearchStrategy greedyByDistanceStrategy = new SearchStrategy(Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
-        greedyByDistanceStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), greedyByDistanceFromDepotInsertion, clusters));
+        greedyByDistanceStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET.toString(), greedyByDistanceFromDepotInsertion, clusters));
 
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
