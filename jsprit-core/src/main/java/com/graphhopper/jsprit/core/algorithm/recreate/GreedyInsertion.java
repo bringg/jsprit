@@ -50,7 +50,7 @@ public class GreedyInsertion extends RegretInsertion {
                         insertJob(job, iData, route);
                     }
                 }
-                unassignedJobs.remove(job);
+                jobIterator.remove();
             }
         }
         return badJobs;
