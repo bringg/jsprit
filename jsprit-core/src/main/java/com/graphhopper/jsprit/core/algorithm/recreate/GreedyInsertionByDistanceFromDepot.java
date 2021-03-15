@@ -8,8 +8,6 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.DriverImpl;
 import com.graphhopper.jsprit.core.problem.job.Job;
-import com.graphhopper.jsprit.core.problem.job.Service;
-import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
@@ -76,19 +74,22 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
         Collections.sort(jobsToInsert, nearestToDepotComparator);
         while (!jobsToInsert.isEmpty()) {
             Job withMostNeighbors = jobsToInsert.remove(0);
-            failedToAssign.addAll(insertJobWithNearest(openRoutes, withMostNeighbors, jobsToInsert));
+            failedToAssign.addAll(insertJobWithNearest(vehicleRoutes, openRoutes, withMostNeighbors, jobsToInsert));
         }
         return failedToAssign;
     }
 
-    private Collection<Job> insertJobWithNearest(Collection<VehicleRoute> vehicleRoutes, Job withMostNeighbors, List<Job> jobsToInsert) {
+    private Collection<Job> insertJobWithNearest(Collection<VehicleRoute> vehicleRoutes, Collection<VehicleRoute> openRoutes, Job withMostNeighbors, List<Job> jobsToInsert) {
         List<Job> jobs = new ArrayList<>();
         jobs.add(withMostNeighbors);
-        Collection<Job> failedToInsert = super.insertUnassignedJobs(vehicleRoutes, jobs);
+        Collection<Job> failedToInsert = super.insertUnassignedJobs(openRoutes, jobs);
         if (!failedToInsert.isEmpty())
             return failedToInsert;
 
-        VehicleRoute route = findRoute(vehicleRoutes, withMostNeighbors);
+        VehicleRoute route = findRoute(openRoutes, withMostNeighbors);
+        if (!vehicleRoutes.contains(route))
+            vehicleRoutes.add(route);
+
         if (route != null && jobNeighbors.containsKey(withMostNeighbors.getId())) {
             Iterator<Job> jobNeighborsIterator = jobNeighbors.get(withMostNeighbors.getId());
             while (jobNeighborsIterator.hasNext()) {
@@ -101,7 +102,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
                     }
                 }
             }
-            vehicleRoutes.remove(route);
+            openRoutes.remove(route);
         } else {
             logger.error("this should not happen route {} jobsThaHavToBeInSameRoute contains key {}", route, jobNeighbors.containsKey(withMostNeighbors.getId()));
         }
