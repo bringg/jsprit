@@ -219,7 +219,7 @@ public class InsertionBuilder {
         } else if (strategy.equals(Strategy.GREEDY_BY_NEIGHBORS)) {
             insertion = new GreedyByNeighborsInsertion(costCalculator, vrp, distanceDiffForNeighbors);
         }  else if (strategy.equals(Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT)) {
-            insertion = new GreedyInsertionByDistanceFromDepot(costCalculator, vrp);
+            insertion = new GreedyInsertionByDistanceFromDepot(costCalculator, vrp, fleetManager);
         } else throw new IllegalStateException("you should never get here");
         for (InsertionListener l : iListeners) insertion.addListener(l);
         return insertion;
