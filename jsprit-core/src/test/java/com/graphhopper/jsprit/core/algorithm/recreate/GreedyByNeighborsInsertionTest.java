@@ -65,12 +65,12 @@ public class GreedyByNeighborsInsertionTest {
             ).build();
         JobInsertionCostsCalculator jobInsertionCostsCalculator = mock(JobInsertionCostsCalculator.class);
         GreedyByNeighborsInsertion greedyByNeighborsInsertion = new GreedyByNeighborsInsertion(jobInsertionCostsCalculator, vrp, 100);
-        Map<String, Integer> neighbors = greedyByNeighborsInsertion.initializeNeighbors();
-        assertEquals(2, neighbors.get("1"), 0);
-        assertEquals(2, neighbors.get("2"), 0);
-        assertEquals(2, neighbors.get("3"), 0);
-        assertEquals(1, neighbors.get("4"), 0);
-        assertEquals(1, neighbors.get("15"), 0);
+        Map<String, Collection<Job>> neighbors = greedyByNeighborsInsertion.initializeNeighbors();
+        assertEquals(2, neighbors.get("1").size(), 0);
+        assertEquals(2, neighbors.get("2").size(), 0);
+        assertEquals(2, neighbors.get("3").size(), 0);
+        assertEquals(1, neighbors.get("4").size(), 0);
+        assertEquals(1, neighbors.get("15").size(), 0);
     }
 
     @Test
