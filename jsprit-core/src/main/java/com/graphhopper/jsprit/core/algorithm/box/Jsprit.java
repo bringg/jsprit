@@ -705,14 +705,12 @@ public class Jsprit {
             .setAllowVehicleSwitch(toBoolean(getProperty(Parameter.VEHICLE_SWITCH.toString())))
             .setActivityInsertionCostCalculator(activityInsertion)
             .setDistanceDiffForNeighbors(Double.valueOf(properties.getProperty(Parameter.DISTANCE_DIFF_FOR_SAME_NEIGHBORHOOD.toString())))
-            .setAllowVehicleSwitch(false)
             .build();
         greedyByNeighborsInsertion.setRandom(random);
 
         final AbstractInsertionStrategy greedyByDistanceFromDepotInsertion = (AbstractInsertionStrategy) new InsertionBuilder(vrp, vehicleFleetManager, stateManager, constraintManager)
             .setInsertionStrategy(InsertionBuilder.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT)
             .considerFixedCosts(Double.valueOf(properties.getProperty(Parameter.FIXED_COST_PARAM.toString())))
-            .setAllowVehicleSwitch(false)
             .setActivityInsertionCostCalculator(activityInsertion)
             .build();
         greedyByDistanceFromDepotInsertion.setRandom(random);
