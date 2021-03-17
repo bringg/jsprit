@@ -705,6 +705,7 @@ public class Jsprit {
             .setAllowVehicleSwitch(toBoolean(getProperty(Parameter.VEHICLE_SWITCH.toString())))
             .setActivityInsertionCostCalculator(activityInsertion)
             .setDistanceDiffForNeighbors(Double.valueOf(properties.getProperty(Parameter.DISTANCE_DIFF_FOR_SAME_NEIGHBORHOOD.toString())))
+            .setAllowVehicleSwitch(false)
             .build();
         greedyByNeighborsInsertion.setRandom(random);
 
