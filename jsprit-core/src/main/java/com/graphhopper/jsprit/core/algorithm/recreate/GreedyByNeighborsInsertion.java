@@ -17,7 +17,7 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
     final double distanceDiffForSameLocation;
     private static Logger logger = LoggerFactory.getLogger(GreedyByNeighborsInsertion.class);
 
-    Map<String, Collection<Job>> jobsThaHavToBeInSameRoute = new HashMap<>();
+    Map<String, Collection<Job>> jobsThaHaveToBeInSameRoute = new HashMap<>();
 
     public GreedyByNeighborsInsertion(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, double distanceDiffForSameLocationMeter) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
@@ -44,9 +44,9 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
                     nearestJobs.add(next);
                 else break;
             }
-            jobsThaHavToBeInSameRoute.put(job.getId(), nearestJobs);
+            jobsThaHaveToBeInSameRoute.put(job.getId(), nearestJobs);
         }
-        return jobsThaHavToBeInSameRoute;
+        return jobsThaHaveToBeInSameRoute;
     }
 
     @Override
@@ -76,11 +76,11 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
     }
 
     private int getNumberOfNearestUnassigned(Job job, List<Job> jobsToInsert) {
-        if (!jobsThaHavToBeInSameRoute.containsKey(job.getId()))
+        if (!jobsThaHaveToBeInSameRoute.containsKey(job.getId()))
             return 0;
 
         HashSet<Job> toInsert = new HashSet<>(jobsToInsert);
-        toInsert.removeAll(jobsThaHavToBeInSameRoute.get(job.getId()));
+        toInsert.removeAll(jobsThaHaveToBeInSameRoute.get(job.getId()));
         return jobsToInsert.size() - toInsert.size();
     }
 
@@ -92,8 +92,8 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
             return failedToInsert;
 
         VehicleRoute route = findRouteThatServesJob(vehicleRoutes, withMostNeighbors);
-        if (route != null && jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId())) {
-            Collection<Job> jobCollection = jobsThaHavToBeInSameRoute.get(withMostNeighbors.getId());
+        if (route != null && jobsThaHaveToBeInSameRoute.containsKey(withMostNeighbors.getId())) {
+            Collection<Job> jobCollection = jobsThaHaveToBeInSameRoute.get(withMostNeighbors.getId());
             for (Job job : jobCollection) {
                 if (jobsToInsert.contains(job)) {
                     InsertionData iData = bestInsertionCalculator.getInsertionData(route, job, route.getVehicle(), NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
@@ -104,7 +104,7 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
                 }
             }
         } else {
-            logger.error("this should not happen route {} jobsThaHavToBeInSameRoute contains key {}", route, jobsThaHavToBeInSameRoute.containsKey(withMostNeighbors.getId()));
+            logger.error("this should not happen route {} jobsThaHavToBeInSameRoute contains key {}", route, jobsThaHaveToBeInSameRoute.containsKey(withMostNeighbors.getId()));
         }
 
         return failedToInsert;
