@@ -49,7 +49,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
 
             final Map<String, Double> routingTimes = new HashMap<>();
             for (Job job : vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().values()) {
-                routingTimes.put(job.getId(), transportCosts.getDistance(vehicle.getStartLocation(), getLocation(job), vehicle.getEarliestDeparture(), vehicle))
+                routingTimes.put(job.getId(), transportCosts.getDistance(vehicle.getStartLocation(), getLocation(job), vehicle.getEarliestDeparture(), vehicle));
             }
 
             final Comparator<Job> comparator = new Comparator<Job>() {
