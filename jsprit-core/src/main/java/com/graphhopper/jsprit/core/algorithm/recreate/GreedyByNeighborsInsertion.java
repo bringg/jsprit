@@ -63,7 +63,11 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
                 return nearestUnassigned.get(job2.getId()) - nearestUnassigned.get(job1.getId());
             }
         };
-        Collections.sort(jobsToInsert, withMostNeighborsComparator);
+        try {
+            Collections.sort(jobsToInsert, withMostNeighborsComparator);
+        } catch (Exception e) {
+            logger.error("failed to sort", e);
+        }
         while (!jobsToInsert.isEmpty()) {
             Job withMostNeighbors = jobsToInsert.remove(0);
             failedToAssign.addAll(insertJobWithNearest(vehicleRoutes, withMostNeighbors, jobsToInsert));

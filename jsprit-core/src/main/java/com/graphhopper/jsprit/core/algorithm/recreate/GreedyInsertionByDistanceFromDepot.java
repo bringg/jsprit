@@ -47,16 +47,23 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
             if (nearestJobByVehicleTypeIdentiffier.containsKey(vehicle.getVehicleTypeIdentifier()))
                 continue;
 
+            final Map<String, Double> routingTimes = new HashMap<>();
+            for (Job job : vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().values()) {
+                routingTimes.put(job.getId(), transportCosts.getDistance(vehicle.getStartLocation(), getLocation(job), vehicle.getEarliestDeparture(), vehicle))
+            }
+
             final Comparator<Job> comparator = new Comparator<Job>() {
                 @Override
                 public int compare(Job job1, Job job2) {
-                    double distance1 = transportCosts.getDistance(vehicle.getStartLocation(), getLocation(job1), vehicle.getEarliestDeparture(), vehicle);
-                    double distance2 = transportCosts.getDistance(vehicle.getStartLocation(), getLocation(job2), vehicle.getEarliestDeparture(), vehicle);
-                    return (int) (distance1 - distance2);
+                    return (int) (routingTimes.get(job1.getId()) - routingTimes.get(job2.getId()));
                 }
             };
-            ArrayList<Job> jobs = new ArrayList<>(vehicleRoutingProblem.getJobs().values());
-            Collections.sort(jobs, comparator);
+            ArrayList<Job> jobs = new ArrayList<>(vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().values());
+            try {
+                Collections.sort(jobs, comparator);
+            } catch (Exception e) {
+                logger.error("failed to sort jobs", e);
+            }
             nearestJobByVehicleTypeIdentiffier.put(vehicle.getVehicleTypeIdentifier(), jobs);
         }
     }
