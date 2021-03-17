@@ -18,12 +18,16 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
     private static Logger logger = LoggerFactory.getLogger(GreedyInsertionByDistanceFromDepot.class);
 
     private final VehicleFleetManager fleetManager;
-    Map<String, Iterator<Job>> jobNeighbors = new HashMap<>();
     Map<VehicleTypeKey, List<Job>> nearestJobByVehicleTypeIdentiffier = new HashMap<>();
+    private final JobNeighborhoods neighborhoods;
+    private final int maxJobs;
 
     public GreedyInsertionByDistanceFromDepot(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, VehicleFleetManager fleetManager) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
         this.fleetManager = fleetManager;
+        this.maxJobs = vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().size();
+        neighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vehicleRoutingProblem, new AvgServiceAndShipmentDistance(vehicleRoutingProblem.getTransportCosts()));
+        neighborhoods.initialise();
         initialize(vehicleRoutingProblem);
     }
 
@@ -39,12 +43,6 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
 
     void initialize(VehicleRoutingProblem vehicleRoutingProblem) {
         final VehicleRoutingTransportCosts transportCosts = vehicleRoutingProblem.getTransportCosts();
-        JobNeighborhoods neighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vehicleRoutingProblem, new AvgServiceAndShipmentDistance(transportCosts));
-        neighborhoods.initialise();
-        for (Job job : vehicleRoutingProblem.getJobs().values()) {
-            jobNeighbors.put(job.getId(), neighborhoods.getNearestNeighborsIterator(vehicleRoutingProblem.getJobs().size(), job));
-
-        }
         for (final Vehicle vehicle : vehicleRoutingProblem.getVehicles()) {
             if (nearestJobByVehicleTypeIdentiffier.containsKey(vehicle.getVehicleTypeIdentifier()))
                 continue;
@@ -116,21 +114,17 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
             }
         }
 
-        if (jobNeighbors.containsKey(jobToInsert.getId())) {
-            Iterator<Job> jobNeighborsIterator = jobNeighbors.get(jobToInsert.getId());
-            while (jobNeighborsIterator.hasNext()) {
-                Job job = jobNeighborsIterator.next();
-                if (jobsToInsert.contains(job)) {
-                    InsertionData iData = bestInsertionCalculator.getInsertionData(route, job, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
-                    if (!(iData instanceof InsertionData.NoInsertionFound)) {
-                        super.insertJob(job, iData, route);
-                        jobsToInsert.remove(job);
-                    }
+        Iterator<Job> jobNeighborsIterator = neighborhoods.getNearestNeighborsIterator(maxJobs, jobToInsert);
+        while (jobNeighborsIterator.hasNext()) {
+            Job job = jobNeighborsIterator.next();
+            if (jobsToInsert.contains(job)) {
+                InsertionData iData = bestInsertionCalculator.getInsertionData(route, job, NO_NEW_VEHICLE_YET, NO_NEW_DEPARTURE_TIME_YET, NO_NEW_DRIVER_YET, Double.MAX_VALUE);
+                if (!(iData instanceof InsertionData.NoInsertionFound)) {
+                    super.insertJob(job, iData, route);
+                    jobsToInsert.remove(job);
                 }
             }
-            openRoutes.remove(route);
-        } else {
-            logger.error("this should not happen route {} jobsThaHavToBeInSameRoute contains key {}", route, jobNeighbors.containsKey(jobToInsert.getId()));
         }
+        openRoutes.remove(route);
     }
 }

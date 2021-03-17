@@ -53,13 +53,14 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
     public Collection<Job> insertUnassignedJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
         final List<Job> jobsToInsert = new ArrayList<>(unassignedJobs);
         Set<Job> failedToAssign = new HashSet<>(insertBreaks(vehicleRoutes, jobsToInsert));
+        final Map<String, Integer> nearestUnassigned = new HashMap<>();
+        for (Job job : unassignedJobs)
+            nearestUnassigned.put(job.getId(), getNumberOfNearestUnassigned(job, jobsToInsert));
 
         Comparator<Job> withMostNeighborsComparator = new Comparator<Job>() {
             @Override
             public int compare(Job job1, Job job2) {
-                int numJobsNearToJob1 = jobsThaHavToBeInSameRoute.containsKey(job1.getId()) ? getJobsUnassigned(jobsThaHavToBeInSameRoute.get(job1.getId()), jobsToInsert) : 0;
-                int numJobsNearToJob2 = jobsThaHavToBeInSameRoute.containsKey(job2.getId()) ? getJobsUnassigned(jobsThaHavToBeInSameRoute.get(job2.getId()), jobsToInsert) : 0;
-                return numJobsNearToJob2 - numJobsNearToJob1;
+                return nearestUnassigned.get(job2.getId()) - nearestUnassigned.get(job1.getId());
             }
         };
         Collections.sort(jobsToInsert, withMostNeighborsComparator);
@@ -70,9 +71,12 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
         return failedToAssign;
     }
 
-    private int getJobsUnassigned(Collection<Job> jobs, List<Job> jobsToInsert) {
+    private int getNumberOfNearestUnassigned(Job job, List<Job> jobsToInsert) {
+        if (!jobsThaHavToBeInSameRoute.containsKey(job.getId()))
+            return 0;
+
         HashSet<Job> toInsert = new HashSet<>(jobsToInsert);
-        toInsert.removeAll(jobs);
+        toInsert.removeAll(jobsThaHavToBeInSameRoute.get(job.getId()));
         return jobsToInsert.size() - toInsert.size();
     }
 
