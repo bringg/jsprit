@@ -27,7 +27,7 @@ import static com.graphhopper.jsprit.core.algorithm.recreate.GreedyByNeighborsIn
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class GreedyInsertionByDistanceFromDepotTest {
+public class GreedyInsertionByDistanceTest {
 
     @Test
     public void noRoutesShouldBeCorrect() {
@@ -38,7 +38,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
         VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(s1).addJob(s2).addVehicle(v).build();
 
         JobInsertionCostsCalculator calculator = getCalculator(vrp);
-        GreedyInsertionByDistanceFromDepot insertionByDistanceFromDepot = new GreedyInsertionByDistanceFromDepot(calculator, vrp);
+        GreedyInsertionByDistance insertionByDistanceFromDepot = new GreedyInsertionByDistance(calculator, vrp);
         Collection<VehicleRoute> routes = new ArrayList<>();
 
         insertionByDistanceFromDepot.insertJobs(routes, vrp.getJobs().values());
@@ -55,7 +55,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
         VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(s1).addJob(s2).addVehicle(v1).addVehicle(v2).build();
 
         JobInsertionCostsCalculator calculator = getCalculator(vrp);
-        GreedyInsertionByDistanceFromDepot insertionByDistanceFromDepot = new GreedyInsertionByDistanceFromDepot(calculator, vrp);
+        GreedyInsertionByDistance insertionByDistanceFromDepot = new GreedyInsertionByDistance(calculator, vrp);
         Collection<VehicleRoute> routes = new ArrayList<>();
         VehicleRoute route = VehicleRoute.Builder.newInstance(v1)
             .addService(s1)
@@ -77,7 +77,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
         VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(s1).addJob(s2).addVehicle(v).build();
 
         JobInsertionCostsCalculator calculator = getCalculator(vrp);
-        GreedyInsertionByDistanceFromDepot insertionByDistanceFromDepot = new GreedyInsertionByDistanceFromDepot(calculator, vrp);
+        GreedyInsertionByDistance insertionByDistanceFromDepot = new GreedyInsertionByDistance(calculator, vrp);
         Collection<VehicleRoute> routes = new ArrayList<>();
 
         insertionByDistanceFromDepot.insertJobs(routes, vrp.getJobs().values());
@@ -99,7 +99,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
 
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp)
             .addCoreStateAndConstraintStuff(true)
-            .setProperty(Jsprit.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET, "1")
+            .setProperty(Jsprit.Strategy.GREEDY_BY_DISTANCE_REGRET, "1")
             .setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 
         VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
@@ -118,7 +118,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
         final VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(s1).addJob(s2)
             .addVehicle(v1).addVehicle(v2).setFleetSize(VehicleRoutingProblem.FleetSize.FINITE).build();
 
-        optimizeAndValidate(vrp, Jsprit.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET);
+        optimizeAndValidate(vrp, Jsprit.Strategy.GREEDY_BY_DISTANCE_REGRET);
     }
 
     @Test
@@ -145,7 +145,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
 
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp)
             .addCoreStateAndConstraintStuff(true)
-            .setProperty(Jsprit.Strategy.GREEDY_BY_DISTANCE_FROM_DEPOT_REGRET, "1")
+            .setProperty(Jsprit.Strategy.GREEDY_BY_DISTANCE_REGRET, "1")
             .setStateAndConstraintManager(stateManager, constraintManager)
             .buildAlgorithm();
 
@@ -173,7 +173,7 @@ public class GreedyInsertionByDistanceFromDepotTest {
         final VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(s1).addJob(s2).addVehicle(v).build();
 
         JobInsertionCostsCalculator calculator = getShipmentCalculator(vrp);
-        GreedyInsertionByDistanceFromDepot insertionByDistanceFromDepot = new GreedyInsertionByDistanceFromDepot(calculator, vrp);
+        GreedyInsertionByDistance insertionByDistanceFromDepot = new GreedyInsertionByDistance(calculator, vrp);
         Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
 
         GreedyByNeighborsInsertionTest.CkeckJobSequence position = new GreedyByNeighborsInsertionTest.CkeckJobSequence(2, s2);

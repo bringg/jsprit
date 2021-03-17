@@ -9,20 +9,21 @@ import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.*;
+import com.graphhopper.jsprit.core.util.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
-    private static Logger logger = LoggerFactory.getLogger(GreedyInsertionByDistanceFromDepot.class);
+public class GreedyInsertionByDistance extends GreedyInsertion {
+    private static Logger logger = LoggerFactory.getLogger(GreedyInsertionByDistance.class);
 
     private final VehicleFleetManager fleetManager;
-    Map<VehicleTypeKey, List<Job>> nearestJobByVehicleTypeIdentiffier = new HashMap<>();
+    Map<Coordinate, List<Job>> nearestJobByVehicleStartLocation = new HashMap<>();
     private final JobNeighborhoods neighborhoods;
     private final int maxJobs;
 
-    public GreedyInsertionByDistanceFromDepot(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, VehicleFleetManager fleetManager) {
+    public GreedyInsertionByDistance(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem, VehicleFleetManager fleetManager) {
         super(jobInsertionCalculator, vehicleRoutingProblem);
         this.fleetManager = fleetManager;
         this.maxJobs = vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().size();
@@ -31,7 +32,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
         initialize(vehicleRoutingProblem);
     }
 
-    GreedyInsertionByDistanceFromDepot(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem) {
+    GreedyInsertionByDistance(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vehicleRoutingProblem) {
         this(jobInsertionCalculator, vehicleRoutingProblem, new FiniteFleetManagerFactory(vehicleRoutingProblem.getVehicles()).createFleetManager());
     }
 
@@ -44,7 +45,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
     void initialize(VehicleRoutingProblem vehicleRoutingProblem) {
         final VehicleRoutingTransportCosts transportCosts = vehicleRoutingProblem.getTransportCosts();
         for (final Vehicle vehicle : vehicleRoutingProblem.getVehicles()) {
-            if (nearestJobByVehicleTypeIdentiffier.containsKey(vehicle.getVehicleTypeIdentifier()))
+            if (nearestJobByVehicleStartLocation.containsKey(vehicle.getStartLocation().getCoordinate()))
                 continue;
 
             final Map<String, Double> routingTimes = new HashMap<>();
@@ -64,7 +65,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
             } catch (Exception e) {
                 logger.error("failed to sort jobs", e);
             }
-            nearestJobByVehicleTypeIdentiffier.put(vehicle.getVehicleTypeIdentifier(), jobs);
+            nearestJobByVehicleStartLocation.put(vehicle.getStartLocation().getCoordinate(), jobs);
         }
     }
 
@@ -92,7 +93,7 @@ public class GreedyInsertionByDistanceFromDepot extends GreedyInsertion {
             VehicleRoute nextRoute = openRoutes.get(random.nextInt(openRoutes.size()));
             Job nearestJob;
             if (nextRoute.isEmpty() || routeWithBreakOnly(nextRoute)) {
-                Iterator<Job> nearestJobsIter = nearestJobByVehicleTypeIdentiffier.get(nextRoute.getVehicle().getVehicleTypeIdentifier()).iterator();
+                Iterator<Job> nearestJobsIter = nearestJobByVehicleStartLocation.get(nextRoute.getVehicle().getStartLocation().getCoordinate()).iterator();
                 nearestJob = nearestJobsIter.next();
                 while (!jobsToInsert.contains(nearestJob) && nearestJobsIter.hasNext()) {
                     nearestJob = nearestJobsIter.next();
