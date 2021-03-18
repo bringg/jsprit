@@ -56,7 +56,7 @@ public class GreedyInsertionByDistance extends GreedyInsertion {
             final Comparator<Job> comparator = new Comparator<Job>() {
                 @Override
                 public int compare(Job job1, Job job2) {
-                    return (int) (routingTimes.get(job1.getId()) - routingTimes.get(job2.getId()));
+                    return Double.compare(routingTimes.get(job1.getId()), routingTimes.get(job2.getId()));
                 }
             };
             ArrayList<Job> jobs = new ArrayList<>(vehicleRoutingProblem.getJobsInclusiveInitialJobsInRoutes().values());

@@ -60,7 +60,7 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
         Comparator<Job> withMostNeighborsComparator = new Comparator<Job>() {
             @Override
             public int compare(Job job1, Job job2) {
-                return nearestUnassigned.get(job2.getId()) - nearestUnassigned.get(job1.getId());
+                return Double.compare(nearestUnassigned.get(job2.getId()), nearestUnassigned.get(job1.getId()));
             }
         };
         try {
