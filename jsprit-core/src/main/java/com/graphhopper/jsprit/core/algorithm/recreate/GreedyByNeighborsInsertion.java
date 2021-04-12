@@ -71,8 +71,9 @@ public class GreedyByNeighborsInsertion extends GreedyInsertion {
         };
         try {
             Collections.shuffle(jobsToInsert);
-            if (random.nextDouble() > ratioNotToSort)
+            if (random.nextDouble() > ratioNotToSort) {
                 Collections.sort(jobsToInsert, withMostNeighborsComparator);
+            }
         } catch (Exception e) {
             logger.error("failed to sort", e);
         }
