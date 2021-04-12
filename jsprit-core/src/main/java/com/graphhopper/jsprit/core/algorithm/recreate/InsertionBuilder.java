@@ -222,7 +222,7 @@ public class InsertionBuilder {
         } else if (strategy.equals(Strategy.RANDOM)) {
             insertion = new RandomInsertion(costCalculator, vrp);
         } else if (strategy.equals(Strategy.GREEDY_BY_NEIGHBORS)) {
-            insertion = new GreedyByNeighborsInsertion(costCalculator, vrp, distanceDiffForNeighbors);
+            insertion = new GreedyByNeighborsInsertion(costCalculator, vrp, distanceDiffForNeighbors, ratioNotToSortJobsGreedyInsertion);
         }  else if (strategy.equals(Strategy.GREEDY_BY_DISTANCE)) {
             insertion = new GreedyInsertionByDistance(costCalculator, vrp, fleetManager);
         } else throw new IllegalStateException("you should never get here");
