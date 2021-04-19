@@ -97,12 +97,20 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
 
     private RouteAndJob getNextJobToInsert(List<Job> jobsToInsert, VehicleRoute vehicleRoute) {
         if (vehicleRoute == null || vehicleRoute.isEmpty()) {
-            return selectRouteAndJob(jobsToInsert);
+            ArrayList<Vehicle> vehicles = new ArrayList<>(fleetManager.getAvailableVehicles());
+            Collections.shuffle(vehicles);
+            RouteAndJob routeAndJob = selectRouteAndJob(jobsToInsert, vehicles);
+            if (routeAndJob != null)
+                fleetManager.lock(routeAndJob.vehicleRoute.getVehicle());
+            return routeAndJob;
         }
 
         Coordinate center = getCenter(vehicleRoute.getTourActivities().getJobs());
-        if (center == null)
-            return selectRouteAndJob(jobsToInsert);
+        if (center == null) {
+            ArrayList<Vehicle> vehicles = new ArrayList<>();
+            vehicles.add(vehicleRoute.getVehicle());
+            return selectRouteAndJob(jobsToInsert, vehicles);
+        }
 
         List<Job> sortedJobs = getNearestJobs(jobsToInsert, vehicleRoute.getVehicle(), Location.newInstance(center.getX(), center.getY()), jobsToInsert.size());
         ArrayList<VehicleRoute> vehicleRoutes = new ArrayList<>();
@@ -117,10 +125,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         return null;
     }
 
-    private RouteAndJob selectRouteAndJob(List<Job> jobsToInsert) {
-        ArrayList<Vehicle> vehicles = new ArrayList<>(fleetManager.getAvailableVehicles());
-        Collections.shuffle(vehicles);
-
+    private RouteAndJob selectRouteAndJob(List<Job> jobsToInsert, ArrayList<Vehicle> vehicles) {
         double nextDouble = random.nextDouble();
         while (!vehicles.isEmpty()) {
             Vehicle vehicle = vehicles.remove(0);
@@ -136,8 +141,9 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
                     job = getRandomJob(jobs);
                 }
                 InsertionData insertionData = bestInsertionCalculator.getInsertionData(route, job, vehicle, vehicle.getEarliestDeparture(), DriverImpl.noDriver(), Double.MAX_VALUE);
-                if (!(insertionData instanceof InsertionData.NoInsertionFound))
+                if (!(insertionData instanceof InsertionData.NoInsertionFound)) {
                     return new RouteAndJob(job, route, insertionData);
+                }
                 jobs.remove(job);
             }
         }
