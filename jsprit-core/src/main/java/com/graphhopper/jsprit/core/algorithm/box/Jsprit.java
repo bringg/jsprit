@@ -224,7 +224,11 @@ public class Jsprit {
             defaults.put(Strategy.RANDOM.toString(), "0.0");
 
             defaults.put(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), "0.0");
+            defaults.put(Strategy.GREEDY_BY_NEIGHBORS_REGRET_WORST.toString(), "0.0");
             defaults.put(Strategy.GREEDY_BY_DISTANCE_REGRET.toString(), "0.0");
+            defaults.put(Strategy.GREEDY_BY_DISTANCE_REGRET_WORST.toString(), "0.0");
+            defaults.put(Strategy.GREEDY_BY_AVERAGE_REGRET.toString(), "0.0");
+            defaults.put(Strategy.GREEDY_BY_AVERAGE_REGRET_WORST.toString(), "0.0");
 
             defaults.put(Parameter.STRING_K_MIN.toString(), "1");
             defaults.put(Parameter.STRING_K_MAX.toString(), "6");
@@ -797,20 +801,18 @@ public class Jsprit {
 
         final SearchStrategy greedyByNeighborsStrategy = new SearchStrategy(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
         greedyByNeighborsStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), greedyByNeighborsInsertion, clusters));
-
-        final SearchStrategy greedyByNeighborsStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
-        greedyByNeighborsStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_NEIGHBORS_REGRET.toString(), greedyByNeighborsInsertion, worst));
+        final SearchStrategy greedyByNeighborsStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_NEIGHBORS_REGRET_WORST.toString(), new SelectRandomly(), acceptor, objectiveFunction);
+        greedyByNeighborsStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_NEIGHBORS_REGRET_WORST.toString(), greedyByNeighborsInsertion, worst));
 
         final SearchStrategy greedyByDistanceStrategy = new SearchStrategy(Strategy.GREEDY_BY_DISTANCE_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
         greedyByDistanceStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_DISTANCE_REGRET.toString(), greedyByDistanceFromDepotInsertion, clusters));
-
-        final SearchStrategy greedyByDistanceStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_DISTANCE_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
-        greedyByDistanceStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_DISTANCE_REGRET.toString(), greedyByDistanceFromDepotInsertion, worst));
+        final SearchStrategy greedyByDistanceStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_DISTANCE_REGRET_WORST.toString(), new SelectRandomly(), acceptor, objectiveFunction);
+        greedyByDistanceStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_DISTANCE_REGRET_WORST.toString(), greedyByDistanceFromDepotInsertion, worst));
 
         final SearchStrategy greedyByAverageStrategy = new SearchStrategy(Strategy.GREEDY_BY_AVERAGE_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
         greedyByAverageStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_AVERAGE_REGRET.toString(), greedyByAverageInsertion, clusters));
-        final SearchStrategy greedyByAverageStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_AVERAGE_REGRET.toString(), new SelectRandomly(), acceptor, objectiveFunction);
-        greedyByAverageStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_AVERAGE_REGRET.toString(), greedyByAverageInsertion, worst));
+        final SearchStrategy greedyByAverageStrategyWorst = new SearchStrategy(Strategy.GREEDY_BY_AVERAGE_REGRET_WORST.toString(), new SelectRandomly(), acceptor, objectiveFunction);
+        greedyByAverageStrategy.addModule(new RuinAndRecreateModule(Strategy.GREEDY_BY_AVERAGE_REGRET_WORST.toString(), greedyByAverageInsertion, worst));
 
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
