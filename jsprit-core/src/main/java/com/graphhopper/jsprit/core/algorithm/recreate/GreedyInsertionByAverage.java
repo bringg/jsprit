@@ -46,7 +46,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
 
     @Override
     public String toString() {
-        return "[name=greedyByNeighborhoodInsertion]";
+        return "[name=greedyByAverageInsertion]";
     }
 
     @Override
@@ -55,14 +55,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         Set<Job> failedToAssign = new HashSet<>(insertBreaks(vehicleRoutes, jobsToInsert));
         ArrayList<VehicleRoute> openRoutes = new ArrayList<>(vehicleRoutes);
         while(!openRoutes.isEmpty()) {
-            VehicleRoute route = openRoutes.remove(0);
-            while (!jobsToInsert.isEmpty()) {
-                RouteAndJob nextJobToInsert = getNextJobToInsert(jobsToInsert, route);
-                if (nextJobToInsert == null)
-                    return getAllUnassigned(jobsToInsert, failedToAssign);
-
-                insertJobsToRoute(jobsToInsert, nextJobToInsert);
-            }
+            insertJobsToRoute(jobsToInsert, openRoutes.remove(0));
         }
 
         if (openRoutes.isEmpty()) {
@@ -77,6 +70,16 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             }
         }
         return getAllUnassigned(jobsToInsert, failedToAssign);
+    }
+
+    private void insertJobsToRoute(List<Job> jobsToInsert, VehicleRoute route) {
+        while (!jobsToInsert.isEmpty()) {
+            RouteAndJob nextJobToInsert = getNextJobToInsert(jobsToInsert, route);
+            if (nextJobToInsert == null)
+                break;
+
+            insertJobsToRoute(jobsToInsert, nextJobToInsert);
+        }
     }
 
     private Collection<Job> getAllUnassigned(List<Job> jobsToInsert, Set<Job> failedToAssign) {
@@ -125,7 +128,6 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         return null;
     }
 
-
     private RouteAndJob selectRouteAndJob(List<Job> jobsToInsert, ArrayList<Vehicle> vehicles) {
         double nextDouble = random.nextDouble();
         while (!vehicles.isEmpty()) {
@@ -146,7 +148,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             } else if (nextDouble < ratioToSelectFarthest) {
                 job = getFarthestJob(jobs, route.getVehicle());
             } else {
-                job = getRandomJob(jobs);
+                job = jobsToInsert.get(random.nextInt(jobsToInsert.size()));
             }
             InsertionData insertionData = bestInsertionCalculator.getInsertionData(route, job, route.getVehicle(), route.getVehicle().getEarliestDeparture(), DriverImpl.noDriver(), Double.MAX_VALUE);
             if (!(insertionData instanceof InsertionData.NoInsertionFound)) {
@@ -172,10 +174,6 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         return new Coordinate(sumLng / sumCoordinates, sumLat / sumCoordinates);
     }
 
-    private Job getRandomJob(List<Job> jobsToInsert) {
-        return jobsToInsert.get(random.nextInt(jobsToInsert.size()));
-    }
-
     private Job getFarthestJob(List<Job> jobsToInsert, Vehicle vehicle) {
         double maxTravelTime = -1;
         Job farthestJob = null;
@@ -191,10 +189,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
 
     private double getTransportTime(Vehicle vehicle, Job job, double transportTime) {
         Location jobLocation = getJobLocation(job);
-        if (jobLocation == null) {
-            return transportTime;
-        }
-        return transportCosts.getTransportTime(vehicle.getStartLocation(), jobLocation, vehicle.getEarliestDeparture(), DriverImpl.noDriver(), vehicle);
+        return jobLocation == null ? transportTime : transportCosts.getTransportTime(vehicle.getStartLocation(), jobLocation, vehicle.getEarliestDeparture(), DriverImpl.noDriver(), vehicle);
     }
 
     static Location getJobLocation(Job job) {
@@ -226,7 +221,6 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             }
         });
         return new ArrayList<>(sortedJobs.subList(0, n));
-
     }
 
     private final class RouteAndJob {
