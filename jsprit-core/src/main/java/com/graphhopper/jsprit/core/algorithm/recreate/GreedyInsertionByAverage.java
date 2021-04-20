@@ -64,7 +64,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
                     break;
 
                 vehicleRoutes.add(insertionData.vehicleRoute);
-                fleetManager.lock(insertionData.vehicleRoute.getVehicle());
+                fleetManager.lock(insertionData.insertionData.getSelectedVehicle());
                 insertJobsToRoute(jobsToInsert, insertionData);
             }
         }
