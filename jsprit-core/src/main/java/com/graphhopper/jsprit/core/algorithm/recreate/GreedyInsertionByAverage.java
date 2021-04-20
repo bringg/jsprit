@@ -217,7 +217,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         Collections.sort(sortedJobs, new Comparator<Job>() {
             @Override
             public int compare(Job job1, Job job2) {
-                return (int) (transportTimes.get(job1.getId()) - transportTimes.get(job2.getId()));
+                return Double.compare(transportTimes.get(job1.getId()), transportTimes.get(job2.getId()));
             }
         });
         return new ArrayList<>(sortedJobs.subList(0, n));
