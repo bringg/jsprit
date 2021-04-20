@@ -18,10 +18,10 @@ import java.util.*;
 
 public class GreedyInsertionByAverage extends GreedyInsertion {
     public static final Coordinate NO_COORDINATE = new Coordinate(0, 0);
-    final double ratioToSelectNearest;
-    final double ratioToSelectRandom;
-    final double ratioToSelectFarthest;
-    final int nJobsToSelectFrom;
+    private final double ratioToSelectNearest;
+    private final double ratioToSelectRandom;
+    private final double ratioToSelectFarthest;
+    private final int nJobsToSelectFrom;
     private static Logger logger = LoggerFactory.getLogger(GreedyByNeighborsInsertion.class);
     private final VehicleRoutingTransportCosts transportCosts;
     private final VehicleFleetManager fleetManager;
@@ -62,7 +62,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             while (!jobsToInsert.isEmpty()) {
                 RouteAndJob insertionData = getNextJobToInsert(jobsToInsert, null);
                 if (insertionData == null)
-                    return getAllUnassigned(jobsToInsert, failedToAssign);
+                    break;
 
                 vehicleRoutes.add(insertionData.vehicleRoute);
                 fleetManager.lock(insertionData.vehicleRoute.getVehicle());
