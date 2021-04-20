@@ -122,7 +122,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             List<Job> nextJobs = new ArrayList<>(sortedJobs.subList(0, Math.min(nJobsToSelectFrom, sortedJobs.size())));
             ScoredJob scoredJob = nextJob(vehicleRoutes, nextJobs, new ArrayList<ScoredJob>());
             if (scoredJob != null && !(scoredJob.getInsertionData() instanceof InsertionData.NoInsertionFound))
-                return new RouteAndJob(scoredJob.getJob(), vehicleRoute, scoredJob.getInsertionData());
+                return new RouteAndJob(scoredJob.getJob(), scoredJob.getRoute(), scoredJob.getInsertionData());
             sortedJobs.removeAll(nextJobs);
         }
         return null;
