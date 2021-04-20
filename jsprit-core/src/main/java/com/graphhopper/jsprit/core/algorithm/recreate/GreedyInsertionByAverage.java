@@ -93,10 +93,12 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
             insertBreak(bestInsertionCalculator, new ArrayList<Job>(), insertionData.vehicleRoute, insertionData.insertionData);
 
         jobsToInsert.remove(insertionData.job);
+        VehicleRoute route = insertionData.vehicleRoute;
         while (!jobsToInsert.isEmpty()) {
-            RouteAndJob nextJobToInsert = getNextJobToInsert(jobsToInsert, insertionData.vehicleRoute);
+            RouteAndJob nextJobToInsert = getNextJobToInsert(jobsToInsert, route);
             if (nextJobToInsert != null) {
-                super.insertJob(nextJobToInsert.job, nextJobToInsert.insertionData, nextJobToInsert.vehicleRoute);
+                route = nextJobToInsert.vehicleRoute;
+                super.insertJob(nextJobToInsert.job, nextJobToInsert.insertionData, route);
                 jobsToInsert.remove(nextJobToInsert.job);
             } else break;
         }
