@@ -206,9 +206,6 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
 
     private List<Job> getNearestJobs(final List<Job> jobsToInsert, final Vehicle vehicle, final Location location, int n) {
         ArrayList<Job> sortedJobs = new ArrayList<>(jobsToInsert);
-        if (jobsToInsert.size() < n)
-            return sortedJobs;
-
         final Map<String, Double> transportTimes = new HashMap<>();
         for (Job job : jobsToInsert) {
             transportTimes.put(job.getId(), transportCosts.getTransportTime(location, getJobLocation(job), vehicle.getEarliestDeparture(), DriverImpl.noDriver(), vehicle));
@@ -220,6 +217,9 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
                 return Double.compare(transportTimes.get(job1.getId()), transportTimes.get(job2.getId()));
             }
         });
+        if (jobsToInsert.size() < n)
+            return sortedJobs;
+
         return new ArrayList<>(sortedJobs.subList(0, n));
     }
 
