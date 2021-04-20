@@ -25,7 +25,6 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
     private static Logger logger = LoggerFactory.getLogger(GreedyByNeighborsInsertion.class);
     private final VehicleRoutingTransportCosts transportCosts;
     private final VehicleFleetManager fleetManager;
-    Map<String, Collection<Job>> jobsThaHaveToBeInSameRoute = new HashMap<>();
 
     public GreedyInsertionByAverage(JobInsertionCostsCalculator jobInsertionCalculator, VehicleRoutingProblem vrp, VehicleFleetManager fleetManager) {
         this(jobInsertionCalculator, vrp, fleetManager, 0.33, 0.33, 0.33, 3);
