@@ -58,4 +58,36 @@ public class RuinFarthestTest extends TestCase {
         assertTrue(jobs.contains(s1));
     }
 
+    @Test
+    public void testFarthestJobsWillBeRemoved() {
+        RuinFarthest ruinFarthest = new RuinFarthest(vrp, 0.8);
+        ruinFarthest.setRuinShareFactory(new RuinShareFactory() {
+            @Override
+            public int createNumberToBeRemoved() {
+                return 2;
+            }
+        });
+        VehicleRoute route1 = VehicleRoute.Builder.newInstance(v1)
+            .addService(s1)
+            .build();
+        route1.getStart().setEndTime(0);
+        route1.getEnd().setArrTime(5 * 60);
+        VehicleRoute route2 = VehicleRoute.Builder.newInstance(v2)
+            .addService(s2)
+            .addService(s3)
+            .addService(s4)
+            .build();
+        route2.getStart().setEndTime(0);
+        route2.getEnd().setArrTime(6 * 60);
+
+        ArrayList<VehicleRoute> routes = new ArrayList<>();
+        routes.add(route1);
+        routes.add(route2);
+
+        Collection<Job> jobs = ruinFarthest.ruinRoutes(routes);
+        assertTrue(jobs.size() == 2);
+        assertTrue(jobs.contains(s4));
+        assertTrue(jobs.contains(s3));
+    }
+
 }
