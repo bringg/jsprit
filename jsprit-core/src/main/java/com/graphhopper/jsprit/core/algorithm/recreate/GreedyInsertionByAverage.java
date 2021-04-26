@@ -112,6 +112,7 @@ public class GreedyInsertionByAverage extends GreedyInsertion {
         }
 
         Coordinate center = getRouteCenter(vehicleRoute.getTourActivities().getJobs());
+
         if (center == null) {
             return getJobToInsertToRoute(jobsToInsert, random.nextDouble(), vehicleRoute);
         }
