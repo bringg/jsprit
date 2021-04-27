@@ -92,10 +92,8 @@ public class RuinFarthest extends AbstractRuinStrategy {
             }
         });
         ArrayList<VehicleRoute> vehicleRoutesToRemove = new ArrayList<>();
-        for (int i = 0; i < vehicleRoutes.size(); ++i) {
-            if (freeTimes.get(vehicleRoutes.get(i)) >= percentileOfFreeTimeRouteToBeRemoved) {
-                vehicleRoutesToRemove.add(vehicleRoutes.get(i));
-            }
+        for (int i = 0; i < vehicleRoutes.size() && freeTimes.get(vehicleRoutes.get(i)) >= percentileOfFreeTimeRouteToBeRemoved; ++i) {
+            vehicleRoutesToRemove.add(vehicleRoutes.get(i));
         }
         return vehicleRoutesToRemove;
     }
