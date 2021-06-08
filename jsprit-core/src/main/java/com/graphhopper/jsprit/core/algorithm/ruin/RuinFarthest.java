@@ -72,12 +72,12 @@ public class RuinFarthest extends AbstractRuinStrategy {
             final Map<VehicleRoute, Double> idleTimes = getRouteIdleTimes(vehicleRoutes);
             ArrayList<VehicleRoute> vehicleRoutesToRemove = getVehicleRoutesToBeRemoved(vehicleRoutes, idleTimes);
             for (VehicleRoute route : vehicleRoutesToRemove) {
-                if (route.getTourActivities().getJobs().size() >= nOfJobs2BeRemoved) {
-                    nOfJobs2BeRemoved -= route.getTourActivities().getJobs().size();
-                    unassignedJobs.addAll(route.getTourActivities().getJobs());
-                    for (Job job : route.getTourActivities().getJobs())
+                Collection<Job> jobs = new HashSet<>(route.getTourActivities().getJobs());
+                if (jobs.size() >= nOfJobs2BeRemoved) {
+                    nOfJobs2BeRemoved -= jobs.size();
+                    unassignedJobs.addAll(jobs);
+                    for (Job job : jobs)
                         route.getTourActivities().removeJob(job);
-
                 }
             }
         }
