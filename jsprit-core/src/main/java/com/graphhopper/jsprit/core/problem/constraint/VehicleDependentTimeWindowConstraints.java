@@ -156,7 +156,7 @@ public class VehicleDependentTimeWindowConstraints implements HardActivityConstr
         return ConstraintsStatus.FULFILLED;
     }
 
-    private ConstraintsStatus validateNotLateToActivityAfterNext(JobInsertionContext iFacts, TourActivity nextAct, double depTimeAtNextAct) {
+    ConstraintsStatus validateNotLateToActivityAfterNext(JobInsertionContext iFacts, TourActivity nextAct, double depTimeAtNextAct) {
         TourActivity nextAfterNext = iFacts.getRoute().getEnd();
         Double latestArrTimeAtNextAfterNextAct = iFacts.getNewVehicle().getLatestArrival();
         if (iFacts.getActivityContext().getInsertionIndex() + 1 < iFacts.getRoute().getActivities().size()) {
