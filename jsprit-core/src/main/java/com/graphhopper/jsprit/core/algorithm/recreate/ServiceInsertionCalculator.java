@@ -18,7 +18,6 @@
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.problem.JobActivityFactory;
-import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint.ConstraintsStatus;
 import com.graphhopper.jsprit.core.problem.constraint.SoftActivityConstraint;
@@ -31,7 +30,10 @@ import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.misc.ActivityContext;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.End;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.Start;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,13 +134,9 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
         while(!tourEnd){
             TourActivity nextAct;
             if(activityIterator.hasNext()) nextAct = activityIterator.next();
-            else {
+            else{
                 nextAct = end;
                 tourEnd = true;
-            }
-            TourActivity next = nextAct;
-            if (nextAct instanceof BreakForMultipleTimeWindowsActivity) {
-                next = getBreakCopyWithUpdatedLocation(service.getLocation(), nextAct);
             }
             boolean not_fulfilled_break = true;
 			for(TimeWindow timeWindow : service.getTimeWindows()) {
@@ -147,10 +145,10 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
                 ActivityContext activityContext = new ActivityContext();
                 activityContext.setInsertionIndex(actIndex);
                 insertionContext.setActivityContext(activityContext);
-                ConstraintsStatus status = fulfilled(insertionContext, prevAct, deliveryAct2Insert, next, prevActStartTime, failedActivityConstraints, constraintManager);
+                ConstraintsStatus status = fulfilled(insertionContext, prevAct, deliveryAct2Insert, nextAct, prevActStartTime, failedActivityConstraints, constraintManager);
                 if (status.equals(ConstraintsStatus.FULFILLED)) {
-                    double additionalICostsAtActLevel = softActivityConstraint.getCosts(insertionContext, prevAct, deliveryAct2Insert, next, prevActStartTime);
-                    double additionalTransportationCosts = activityInsertionCostsCalculator.getCosts(insertionContext, prevAct, next, deliveryAct2Insert, prevActStartTime);
+                    double additionalICostsAtActLevel = softActivityConstraint.getCosts(insertionContext, prevAct, deliveryAct2Insert, nextAct, prevActStartTime);
+                    double additionalTransportationCosts = activityInsertionCostsCalculator.getCosts(insertionContext, prevAct, nextAct, deliveryAct2Insert, prevActStartTime);
                     if (additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts < bestCost) {
                         bestCost = additionalICostsAtRouteLevel + additionalICostsAtActLevel + additionalTransportationCosts;
                         insertionIndex = actIndex;
@@ -162,8 +160,8 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
                 }
 			}
             if(not_fulfilled_break) break;
-            double nextActArrTime = prevActStartTime + transportCosts.getTransportTime(prevAct.getLocation(), next.getLocation(), prevActStartTime, newDriver, newVehicle);
-            prevActStartTime = Math.max(nextActArrTime, next.getTheoreticalEarliestOperationStartTime()) + activityCosts.getActivityDuration(prevAct, next,nextActArrTime,newDriver,newVehicle);
+            double nextActArrTime = prevActStartTime + transportCosts.getTransportTime(prevAct.getLocation(), nextAct.getLocation(), prevActStartTime, newDriver, newVehicle);
+            prevActStartTime = Math.max(nextActArrTime, nextAct.getTheoreticalEarliestOperationStartTime()) + activityCosts.getActivityDuration(prevAct, nextAct,nextActArrTime,newDriver,newVehicle);
             prevAct = nextAct;
             actIndex++;
         }
@@ -180,5 +178,6 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
         insertionData.setVehicleDepartureTime(newVehicleDepartureTime);
         return insertionData;
     }
+
 
 }
