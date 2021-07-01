@@ -94,13 +94,4 @@ abstract class AbstractInsertionCalculator implements JobInsertionCostsCalculato
         return ConstraintsStatus.FULFILLED;
     }
 
-
-    protected TourActivity getBreakCopyWithUpdatedLocation(Location location, TourActivity activity) {
-        final BreakForMultipleTimeWindowsActivity breakForMultipleTimeWindowsActivity = (BreakForMultipleTimeWindowsActivity) activity.duplicate();
-        breakForMultipleTimeWindowsActivity.setLocation(Location.Builder.newInstance()
-            .setId(breakForMultipleTimeWindowsActivity.getJob().getLocation().getId())
-            .setCoordinate(location.getCoordinate()).build());
-        return breakForMultipleTimeWindowsActivity;
-    }
-
 }

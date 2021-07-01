@@ -109,9 +109,6 @@ final class BreakForMultipleTimeWindowsInsertionCalculator extends AbstractInser
             breakAct2Insert.setTheoreticalEarliestOperationStartTime(breakToInsert.getTimeWindow().getStart());
             breakAct2Insert.setTheoreticalLatestOperationStartTime(breakToInsert.getTimeWindow().getEnd());
 
-            if (nextAct instanceof BreakForMultipleTimeWindowsActivity) {
-                next = getBreakCopyWithUpdatedLocation(location, nextAct);
-            }
             ActivityContext activityContext = new ActivityContext();
             activityContext.setInsertionIndex(actIndex);
             insertionContext.setActivityContext(activityContext);

@@ -137,9 +137,6 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
                 tourEnd = true;
             }
             TourActivity next = nextAct;
-            if (nextAct instanceof BreakForMultipleTimeWindowsActivity) {
-                next = getBreakCopyWithUpdatedLocation(service.getLocation(), nextAct);
-            }
             boolean not_fulfilled_break = true;
 			for(TimeWindow timeWindow : service.getTimeWindows()) {
                 deliveryAct2Insert.setTheoreticalEarliestOperationStartTime(timeWindow.getStart());

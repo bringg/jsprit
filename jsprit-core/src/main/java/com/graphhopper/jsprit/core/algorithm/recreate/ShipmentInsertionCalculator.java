@@ -136,9 +136,6 @@ final class ShipmentInsertionCalculator extends AbstractInsertionCalculator {
             }
 
             TourActivity nextPickup = nextAct_PickupLoop;
-            if (nextAct_PickupLoop instanceof BreakForMultipleTimeWindowsActivity) {
-                nextPickup = getBreakCopyWithUpdatedLocation(pickupShipment.getLocation(), nextAct_PickupLoop);
-            }
             boolean pickupInsertionNotFulfilledBreak = true;
             for(TimeWindow pickupTimeWindow : shipment.getPickupTimeWindows()) {
                 pickupShipment.setTheoreticalEarliestOperationStartTime(pickupTimeWindow.getStart());
@@ -186,9 +183,6 @@ final class ShipmentInsertionCalculator extends AbstractInsertionCalculator {
                     }
 
                     TourActivity next = nextAct_deliveryLoop;
-                    if (nextAct_deliveryLoop instanceof BreakForMultipleTimeWindowsActivity) {
-                        next = getBreakCopyWithUpdatedLocation(deliverShipment.getLocation(), nextAct_deliveryLoop);
-                    }
 
                     boolean deliveryInsertionNotFulfilledBreak = true;
                     for (TimeWindow deliveryTimeWindow : shipment.getDeliveryTimeWindows()) {
